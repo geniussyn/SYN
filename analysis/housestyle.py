@@ -7,11 +7,17 @@ the pixels of the shipped figures (`figs/fig_recall_distribution.png`,
 
     axes background  #EAEAF2   grid white   text #262626
       -> matplotlib's seaborn-v0_8-darkgrid, verbatim
-    BLUE   #0000F5   Vanilla
-    RED    #EA3323   SYN
+    BLUE   #0000F5   SYN
+    RED    #EA3323   Vanilla
     GREEN  #6AA66E   Vanilla, efConstruction sweep (fig_hnsw)
     ORANGE #F2A93C   annotation rules (fig_efc)
     INK    #262626   neutral series
+
+These two lines named the arms the other way round until 2026-09-29. The code
+never did -- every figure that draws the two arms has written
+`[("vanilla", ..., H.RED), ("syn", ..., H.BLUE)]` from the start -- so the
+comment was describing the sampled source figures rather than this palette's
+use, and reading it was a way to get the paper's two arms backwards.
 
 GREEN and ORANGE are darkened from those readings to #2E7D32 and #D97706. The
 originals were chosen against two accents; carrying four families on one axes

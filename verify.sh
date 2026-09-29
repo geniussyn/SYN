@@ -83,22 +83,21 @@ else
 fi
 
 echo "6. every shipped figure has the script that drew it, and vice versa"
-for f in fig_families fig_mutual_rank_motivation fig_dist fig_strata \
-         fig_ngfix fig_rerank_strata; do
-  # fig_mutual_rank.py draws both of its cuts; check the script by its stem
-  src="${f%%_motivation}"
-  [ -f "$CODE/$src.py" ] || { bad "$(basename "$CODE")/$src.py missing"; continue; }
+for f in fig_families fig_mutual_rank fig_strata \
+         fig_build_cost fig_rerank_strata; do
   # fig_strata writes fig_strata_M16
+  [ -f "$CODE/$f.py" ] || { bad "$(basename "$CODE")/$f.py missing"; continue; }
   hit=$(ls "$FIGS"/"$f"*.pdf 2>/dev/null | head -1)
-  [ -n "$hit" ] && ok "$src.py -> $(basename "$hit")" || bad "$src.py drew nothing"
+  [ -n "$hit" ] && ok "$f.py -> $(basename "$hit")" || bad "$f.py drew nothing"
 done
 extra=$(ls "$FIGS"/*.pdf 2>/dev/null | wc -l)
-# 10 in the main text and 2 in the appendix. The loop above checks the six whose
-# script name matches their output; the other four -- encoders, hardness
-# measures, tail censor and the repair cut of the mutual-rank pair -- are checked
-# by 6b, 6d and the loop's own stem rule, so only the count is asserted here.
-[ "$extra" -eq 12 ] && ok "10 main figures and 2 appendix, no strays" \
-  || bad "$extra figures shipped, expected 12"
+# 8 in the main text and 2 in the appendix. The paper's fig4 is a schematic with
+# no script in the lab and is not shipped, so the submission's nine main figures
+# are eight here. The loop above checks the five whose script name matches their
+# output; encoders, hardness measures and tail censor are checked by 6b and 6d,
+# and the appendix pair is drawn by fig_ngfix.py and fig_rerank_strata.py.
+[ "$extra" -eq 10 ] && ok "8 main figures and 2 appendix, no strays" \
+  || bad "$extra figures shipped, expected 10"
 
 echo "6b. the tail-censoring measurement ships with its scripts"
 if [ -f "$FIGS/fig_tail_censor.pdf" ]; then

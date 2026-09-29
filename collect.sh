@@ -156,7 +156,7 @@ fi
 # ------------------------------------------------------------- measurement ---
 # the entry points the paper needs, plus everything they import
 MODULES="audit_timing build_mmarco encode_cache
-         fig_dist fig_families fig_ivf_spread fig_mutual_rank
+         fig_build_cost fig_families fig_ivf_spread fig_mutual_rank
          fig_ngfix fig_rerank_strata fig_strata fig_sweep
          goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
@@ -275,10 +275,18 @@ cp "$LAB"/tailcensor/out/*.json "$LAB"/tailcensor/out/*.npz \
    "$LAB"/tailcensor/out/summary.txt "$HERE"/studies/tail-censoring/out/ 2>/dev/null || true
 
 # ------------------------------------------------------------------ figures --
-for f in fig_families fig_dist fig_strata_M16 fig_ngfix fig_rerank_strata \
-         fig_tail_censor fig_hardness_measures \
-         fig_encoders fig_mutual_rank_motivation \
-         fig_mutual_rank_repair \
+# The English submission's figures, in its order. fig_dist and the main
+# fig_ngfix are drawn but appear only in the Korean draft, and fig_mutual_rank
+# ships whole rather than as the two cuts -- the paper crops it with a viewport.
+# fig_ngfix.py and fig_rerank_strata.py still ship: each draws one of the two
+# appendix figures as well as the cut the Korean draft uses.
+#   paper fig1 tail_censor   fig2 mutual_rank    fig3 hardness_measures
+#         fig5 strata        fig6 families       fig7 build_cost
+#         fig8 rerank_fever  fig9 encoders       figA1/A2 the appendix pair
+# fig4_mechanism is a schematic and has no script in the lab; it is not here.
+for f in fig_tail_censor fig_mutual_rank fig_hardness_measures \
+         fig_strata_M16 fig_families fig_build_cost \
+         fig_rerank_strata fig_encoders \
          figA_ngfix_all figA_rerank_all; do
   for e in pdf png; do
     [ -f "$LAB/figs/final/$f.$e" ] && cp "$LAB/figs/final/$f.$e" "$HERE/figures/"

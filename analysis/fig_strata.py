@@ -40,10 +40,15 @@ OUT = ROOT / "figures"
 # is not in the paper; its strata files are in results/excluded/.
 # the label is the name; the corpus size is appended from the measurement, so a
 # panel cannot claim a size the run it draws did not have
+# The sixth panel used to be mMARCO Arabic. It was measured and is reported in
+# the cross-lingual paragraph, but a second query language proves the same thing
+# the first one does, whereas nothing else in the paper answers whether any of
+# this survives an order of magnitude more documents. The scale point takes the
+# slot: the same adapter, trained on 500 queries against the 1M subset, applied
+# unchanged to the full 8.8M collection that contains it.
 COLLS = [("msmarco-1m", "MS MARCO"), ("fever", "FEVER"), ("nq", "NQ"),
          ("quora", "Quora"),
          ("msmarco-fr", "mMARCO French"),
-         ("msmarco-ar", "mMARCO Arabic"),
          # one scale point: the same collection at its full size, same adapter
          ("msmarco-8m", "MS MARCO")]
 # colour = arm

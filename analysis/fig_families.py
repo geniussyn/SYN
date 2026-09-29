@@ -75,7 +75,15 @@ TAG = "__own_M8"
 # are still in results/family_*__own_M8.json, and no claim in the paper is made
 # below 0.90. The scale is shared by every panel, so the columns can be read
 # against each other.
-YFLOOR = 0.80
+# ...except the all-query row on the harder collections. The all-query grid was
+# measured to efSearch 512 and no further -- the hard-decile grid runs to 65k --
+# and on FEVER the untrained arms have not arrived by then: Vamana tops out at
+# 0.788 and NSG at 0.809, so at a 0.80 floor one baseline vanishes entirely and
+# another is a single marker. That reads as a missing measurement when it is a
+# truncated one. The row drops to 0.70, where all four baselines show the shape
+# of their approach, and the two rows are then not on one scale -- which is why
+# each row's floor is drawn on its own axis rather than inherited.
+YFLOOR = {"hard": 0.80, "all": 0.70}
 # The right edge: where every curve in the panel has reached this. Raised with
 # the floor -- a panel that begins at 0.80 has to show the approach to 1.0 or it
 # is cropped to a sliver -- and 0.99 is the deepest declarative target measured.
@@ -111,10 +119,14 @@ def yticks(floor):
 def main(fname="fig_families", tag=TAG):
     H.setup(13)
     nr, nc = len(POPS), len(COLLS)
-    # NOT sharey: Quora is cropped to its own high-recall decile, so the
-    # columns are on different scales and each must show its own ticks
+    # sharey by ROW, not across the whole grid. Within a row the four columns
+    # must be on one scale or they cannot be read against each other; between
+    # the rows they must not be, because the all-query row starts lower -- its
+    # grid stops at efSearch 512 and the untrained arms have not arrived by
+    # then. Sharing all eight panels silently gives every panel the last floor
+    # that was set, which is how the hard-decile row ended up drawn at 0.70.
     fig, axes = plt.subplots(nr, nc, figsize=(4.3 * nc, 3.5 * nr),
-                             sharey=True, squeeze=False)
+                             sharey="row", squeeze=False)
     note, drew = {}, 0
     for c, _ in COLLS:
         for fam, *_ in FAMILIES:
@@ -126,6 +138,7 @@ def main(fname="fig_families", tag=TAG):
                                  else f"{nd/1e3:.0f}K")
                 break
     for r, (pop, plab) in enumerate(POPS):
+        floor = YFLOOR[pop]
         for cix, (c, clab) in enumerate(COLLS):
             ax = axes[r][cix]
             xmax, xmin = 0.0, float("inf")
@@ -143,7 +156,7 @@ def main(fname="fig_families", tag=TAG):
                     # and the left edge: the points under the floor are not
                     # drawn, so autoscaling on them would leave the panel
                     # opening on empty space
-                    vis = [x for x, y in g if y >= YFLOOR]
+                    vis = [x for x, y in g if y >= floor]
                     if vis:
                         xmin = min(xmin, vis[0])
                     ax.plot([x for x, _ in g], [y for _, y in g],
@@ -164,8 +177,8 @@ def main(fname="fig_families", tag=TAG):
             if xmax > 0:
                 ax.set_xlim(left=(xmin * 0.85 if xmin < float("inf") else None),
                             right=xmax * 1.3)
-            ax.set_ylim(YFLOOR, 1.0 + (1.0 - YFLOOR) * 0.025)
-            ax.set_yticks(yticks(YFLOOR))
+            ax.set_ylim(floor, 1.0 + (1.0 - floor) * 0.025)
+            ax.set_yticks(yticks(floor))
             if r == 0:
                 n = N_DOCS.get(c)
                 ax.set_title(f"{clab} {n}" if n else clab, pad=7)
