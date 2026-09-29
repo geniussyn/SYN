@@ -1,0 +1,6 @@
+% hard decile, HNSW M=16 efC=200, each arm against its own exact top-10
+% t@r is the per-query search time at which the arm first reaches recall r
+    untrained & 3.135 & 1.00 & 6.261 & 1.00 \\
+    full SYN               & 0.402 & 7.80 & 0.609 & 10.28 \\
+    no pull ($\lambda_{pull}=0$) & 0.602 & 5.20 & 1.058 & 5.92 \\
+    plain gradient (no query-radial) & 0.518 & 6.06 & 0.878 & 7.13 \\

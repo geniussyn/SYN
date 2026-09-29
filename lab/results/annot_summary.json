@@ -1,0 +1,95 @@
+{
+  "n_both": 698,
+  "n_final": 698,
+  "guideline_versions": [
+    "v1.0"
+  ],
+  "heuristic_agreement": null,
+  "uncertain_mode": "exclude",
+  "shares": {
+    "single_topic": {
+      "n": 81,
+      "share": 0.11604584527220631,
+      "ci": [
+        0.09435892385978319,
+        0.14193598940839589
+      ]
+    },
+    "genuine_polysemy": {
+      "n": 9,
+      "share": 0.012893982808022923,
+      "ci": [
+        0.006798058277369125,
+        0.02432235407778338
+      ]
+    },
+    "surface_collision": {
+      "n": 595,
+      "share": 0.8524355300859598,
+      "ci": [
+        0.8241959637877565,
+        0.8768169143317508
+      ]
+    },
+    "mixed": {
+      "n": 9,
+      "share": 0.012893982808022923,
+      "ci": [
+        0.006798058277369125,
+        0.02432235407778338
+      ]
+    },
+    "unclear": {
+      "n": 4,
+      "share": 0.0057306590257879654,
+      "ci": [
+        0.002230695243525418,
+        0.014641487881555797
+      ]
+    }
+  },
+  "agreement": null,
+  "annotators": [
+    "annot/records_main_M1.jsonl"
+  ],
+  "single_annotator": true,
+  "per_label": {
+    "single_topic": {
+      "n": 81,
+      "phi1": 5.160493827160494,
+      "phi3": null,
+      "recall_ef16": 0.3172839533215688,
+      "largest_group_fraction": 0.6444444444444444
+    },
+    "genuine_polysemy": {
+      "n": 9,
+      "phi1": 6.666666666666667,
+      "phi3": null,
+      "recall_ef16": 0.2222222230500645,
+      "largest_group_fraction": 0.37777777777777777
+    },
+    "surface_collision": {
+      "n": 595,
+      "phi1": 7.749579831932773,
+      "phi3": null,
+      "recall_ef16": 0.2873949624159757,
+      "largest_group_fraction": 0.26571428571428574
+    },
+    "mixed": {
+      "n": 9,
+      "phi1": 7.222222222222222,
+      "phi3": null,
+      "recall_ef16": 0.25555555688010323,
+      "largest_group_fraction": 0.2888888888888889
+    },
+    "unclear": {
+      "n": 4,
+      "phi1": 9.0,
+      "phi3": null,
+      "recall_ef16": 0.20000000298023224,
+      "largest_group_fraction": 0.22499999999999998
+    }
+  },
+  "confusion_vs_kmeans": {},
+  "n_unresolved": 0
+}

@@ -1,0 +1,42 @@
+{
+  "corpus": "nq",
+  "repo": "BeIR/nq",
+  "eval_split": "test",
+  "relevance_levels": [
+    1
+  ],
+  "graded_relevance": false,
+  "judged_per_query_mean": 1.2169756662804172,
+  "positives_per_query_mean": 1.2169756662804172,
+  "positives_per_query_median": 1.0,
+  "n_docs_original": 2681468,
+  "n_docs_subset": 1000000,
+  "n_judged_total": 4201,
+  "n_judged_in_corpus": 4201,
+  "n_judged_missing": 0,
+  "subset_seed": 20260809,
+  "n_core": 4201,
+  "n_fill": 995799,
+  "n_eval_queries": 3452,
+  "git_sha": "unknown",
+  "git_dirty": true,
+  "host_os": "Linux-6.17.0-14-generic-x86_64-with-glibc2.39",
+  "hardware": {
+    "cpu_count": 128,
+    "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "gpu_mem_gb": 102.0,
+    "gpu_capability": "12.0",
+    "cuda": "12.8",
+    "bf16_supported": true
+  },
+  "packages": {
+    "python": "3.12.3",
+    "numpy": "2.1.2",
+    "torch": "2.8.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "faiss": "1.14.1",
+    "pyarrow": "25.0.1"
+  },
+  "ts": "2026-09-21T04:57:06+0000"
+}

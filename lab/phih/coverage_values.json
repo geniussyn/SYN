@@ -1,0 +1,82 @@
+{
+  "what": "Table 2 (SS3.3): fragmentation across data types and embedding models.",
+  "definition": "hard and easy are the bottom and top 10% of queries by baseline graph recall@10; phi_h is the number of components of the exact top-10 under h-hop mutual reachability in the stored HNSW level-0 graph.",
+  "provenance": "Transcribed from the nine-corpus campaign, not re-measured for this artifact. phih.cpp and dump_graph.py here implement the same definition, but only GloVe, MS MARCO ada-002 and YouTube-1M have their indexes and ground truth reachable from this repository; SIFT, DEEP-image and OpenAI do not. This file exists so the transcription into table_coverage.tex can be checked mechanically even where the measurement cannot be repeated.",
+  "reproducible_here": [
+    "glove"
+  ],
+  "rows": [
+    {
+      "corpus": "SIFT",
+      "metric": "L2",
+      "n": 1000000,
+      "dim": 128,
+      "recall10_hard": 0.8395,
+      "recall10_easy": 1.0,
+      "phi1_hard": 6.99,
+      "phi1_easy": 2.96,
+      "phi3_hard": 1.11,
+      "phi3_easy": 1.0,
+      "pr_phi3_eq1_hard": 0.902,
+      "role": "only L2 row; weakest case"
+    },
+    {
+      "corpus": "GloVe",
+      "metric": "angular",
+      "n": 1183514,
+      "dim": 100,
+      "recall10_hard": 0.2669,
+      "recall10_easy": 1.0,
+      "phi1_hard": 9.39,
+      "phi1_easy": 2.53,
+      "phi3_hard": 5.24,
+      "phi3_easy": 1.0,
+      "pr_phi3_eq1_hard": 0.031,
+      "role": "strongest case; the one corpus also in fig_hardness_measures"
+    },
+    {
+      "corpus": "DEEP-image",
+      "metric": "angular",
+      "n": 9990000,
+      "dim": 96,
+      "recall10_hard": 0.6721,
+      "recall10_easy": 1.0,
+      "phi1_hard": 8.63,
+      "phi1_easy": 3.13,
+      "phi3_hard": 1.94,
+      "phi3_easy": 1.0,
+      "pr_phi3_eq1_hard": 0.502,
+      "role": "only point above 1M; image CNN"
+    },
+    {
+      "corpus": "OpenAI",
+      "metric": "angular",
+      "n": 990000,
+      "dim": 1536,
+      "recall10_hard": 0.7365,
+      "recall10_easy": 1.0,
+      "phi1_hard": 6.37,
+      "phi1_easy": 2.42,
+      "phi3_hard": 1.65,
+      "phi3_easy": 1.0,
+      "pr_phi3_eq1_hard": 0.567,
+      "role": "learned text; matches the ada-002 corpus in fig_hardness_measures"
+    }
+  ],
+  "noted_in_caption": {
+    "openai_3072_vs_1536_phi3": [
+      1.64,
+      1.65
+    ]
+  },
+  "dropped_not_moved": {
+    "corpora": [
+      "GIST",
+      "word2vec",
+      "OpenAI-3072",
+      "Cohere",
+      "Wikipedia"
+    ],
+    "note": "Measured in the nine-corpus campaign and cut from the paper entirely, not moved to an appendix. The four rows kept span both metrics, dim 96-1536, classical descriptors / word embeddings / image CNN / learned text, and 1M vs 10M; SIFT is the weakest case and GloVe the strongest, so the pair brackets the observed range."
+  }
+}

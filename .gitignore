@@ -1,0 +1,30 @@
+# The repository is the artifact, not the lab. collect.sh assembles it, so
+# anything large here is a mistake rather than a thing to ignore. These entries
+# exist because the two are easy to confuse when working in the same checkout.
+
+# inputs: regenerable, and far too large to version
+lab/emb/
+lab/corpora/*
+!lab/corpora/*_manifest.json
+lab/results/*.npz
+!lab/results/perquery_*.npz
+!lab/results/gt_msmarco-1m__*.npz
+!lab/results/harddecile_msmarco-1m__*.npz
+
+# scratch that the lanes write
+lab/work/*.log
+lab/figs/**/DONE_*
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# adapters and mined tensors live in the training tree, not here
+adapters/
+*.safetensors
+*.bin
+!lab/cpp/**
+
+# editor and OS
+.DS_Store
+__MACOSX/
+*.swp

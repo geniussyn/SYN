@@ -1,0 +1,14 @@
+{
+  "vanilla": {
+    "n_gold_first": 3442,
+    "n_lost": 583,
+    "rate": 0.1693782684485764,
+    "n_demoted": 2
+  },
+  "syn": {
+    "n_gold_first": 3101,
+    "n_lost": 126,
+    "rate": 0.040632054176072234,
+    "n_demoted": 1
+  }
+}

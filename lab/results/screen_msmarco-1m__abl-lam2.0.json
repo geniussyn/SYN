@@ -1,0 +1,17 @@
+{
+  "corpus": "msmarco-1m",
+  "arm": "abl-lam2.0",
+  "M": 16,
+  "maxM0": 32,
+  "k": 10,
+  "n_queries": 1000,
+  "query_seed": 777,
+  "phi1_hat": 1.388,
+  "pr_phi1_hat_eq_1": 0.773,
+  "median_mutual_rank": 9.0,
+  "pair_within_maxM0": 0.7224444444444444,
+  "exhaustive_mrr10": 0.5485079365079364,
+  "exhaustive_ndcg10": 0.5947560885082601,
+  "exhaustive_gold10": 0.7511666666666668,
+  "note": "phi1_hat: components of the target set under the best graph a builder with out-degree maxM0 could make. No index, no build noise; a bound on the real phi_1."
+}

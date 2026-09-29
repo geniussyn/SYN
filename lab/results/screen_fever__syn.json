@@ -1,0 +1,17 @@
+{
+  "corpus": "fever",
+  "arm": "syn",
+  "M": 16,
+  "maxM0": 32,
+  "k": 10,
+  "n_queries": 1000,
+  "query_seed": 777,
+  "phi1_hat": 1.692,
+  "pr_phi1_hat_eq_1": 0.628,
+  "median_mutual_rank": 21.0,
+  "pair_within_maxM0": 0.5564222222222223,
+  "exhaustive_mrr10": 0.9205150793650794,
+  "exhaustive_ndcg10": 0.8999479025498134,
+  "exhaustive_gold10": 0.9397174603174603,
+  "note": "phi1_hat: components of the target set under the best graph a builder with out-degree maxM0 could make. No index, no build noise; a bound on the real phi_1."
+}

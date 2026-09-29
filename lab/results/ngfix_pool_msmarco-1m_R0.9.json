@@ -1,0 +1,126 @@
+{
+  "hard": {
+    "vanilla": {
+      "500": {
+        "no_repair_ms": 4.34195,
+        "ngfix_ms": 4.31667,
+        "gain": 1.00585636613408,
+        "no_repair_max_recall": 0.944699,
+        "ngfix_max_recall": 0.945272
+      },
+      "4000": {
+        "no_repair_ms": 4.17424,
+        "ngfix_ms": 4.25334,
+        "gain": 0.9814028504657517,
+        "no_repair_max_recall": 0.944699,
+        "ngfix_max_recall": 0.948281
+      },
+      "16000": {
+        "no_repair_ms": 4.22232,
+        "ngfix_ms": 2.94612,
+        "gain": 1.4331799112052461,
+        "no_repair_max_recall": 0.944699,
+        "ngfix_max_recall": 0.955874
+      },
+      "59242": {
+        "no_repair_ms": 4.11578,
+        "ngfix_ms": 2.10773,
+        "gain": 1.9527074150863724,
+        "no_repair_max_recall": 0.944699,
+        "ngfix_max_recall": 0.966332
+      }
+    },
+    "syn": {
+      "500": {
+        "no_repair_ms": 0.425686,
+        "ngfix_ms": 0.4246,
+        "gain": 1.0025577013659916,
+        "no_repair_max_recall": 0.998567,
+        "ngfix_max_recall": 0.998567
+      },
+      "4000": {
+        "no_repair_ms": 0.425943,
+        "ngfix_ms": 0.460607,
+        "gain": 0.9247427850640568,
+        "no_repair_max_recall": 0.998567,
+        "ngfix_max_recall": 0.998567
+      },
+      "16000": {
+        "no_repair_ms": 0.42538,
+        "ngfix_ms": 0.381734,
+        "gain": 1.1143361607821152,
+        "no_repair_max_recall": 0.998567,
+        "ngfix_max_recall": 0.998711
+      },
+      "59242": {
+        "no_repair_ms": 0.422858,
+        "ngfix_ms": 0.399738,
+        "gain": 1.0578378838138982,
+        "no_repair_max_recall": 0.998567,
+        "ngfix_max_recall": 0.998997
+      }
+    }
+  },
+  "test": {
+    "vanilla": {
+      "500": {
+        "no_repair_ms": 0.405558,
+        "ngfix_ms": 0.410737,
+        "gain": 0.9873909582043984,
+        "no_repair_max_recall": 0.99202,
+        "ngfix_max_recall": 0.992106
+      },
+      "4000": {
+        "no_repair_ms": 0.401344,
+        "ngfix_ms": 0.344545,
+        "gain": 1.1648521963749292,
+        "no_repair_max_recall": 0.99202,
+        "ngfix_max_recall": 0.992607
+      },
+      "16000": {
+        "no_repair_ms": 0.397744,
+        "ngfix_ms": 0.303978,
+        "gain": 1.308463112462086,
+        "no_repair_max_recall": 0.99202,
+        "ngfix_max_recall": 0.993668
+      },
+      "59242": {
+        "no_repair_ms": 0.392631,
+        "ngfix_ms": 0.260681,
+        "gain": 1.5061742129269107,
+        "no_repair_max_recall": 0.99202,
+        "ngfix_max_recall": 0.995287
+      }
+    },
+    "syn": {
+      "500": {
+        "no_repair_ms": 0.120401,
+        "ngfix_ms": 0.121384,
+        "gain": 0.9919017333421207,
+        "no_repair_max_recall": 0.999857,
+        "ngfix_max_recall": 0.999857
+      },
+      "4000": {
+        "no_repair_ms": 0.123443,
+        "ngfix_ms": 0.126481,
+        "gain": 0.9759805820637091,
+        "no_repair_max_recall": 0.999857,
+        "ngfix_max_recall": 0.999857
+      },
+      "16000": {
+        "no_repair_ms": 0.119719,
+        "ngfix_ms": 0.122416,
+        "gain": 0.9779685662004968,
+        "no_repair_max_recall": 0.999857,
+        "ngfix_max_recall": 0.999871
+      },
+      "59242": {
+        "no_repair_ms": 0.123457,
+        "ngfix_ms": 0.105212,
+        "gain": 1.1734117781241684,
+        "no_repair_max_recall": 0.999857,
+        "ngfix_max_recall": 0.9999
+      }
+    }
+  }
+}

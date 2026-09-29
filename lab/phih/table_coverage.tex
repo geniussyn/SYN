@@ -1,0 +1,34 @@
+% Fragmentation across data types and embedding models (§3.3).
+% Four rows selected from the nine-corpus campaign to span: both metrics, dim 96-1536,
+% classical descriptors / word embeddings / image CNN / learned text, and 1M vs 10M.
+% SIFT is the weakest case and GloVe the strongest, so the pair brackets the range.
+% The remaining five corpora (GIST, word2vec, OpenAI-3072, Cohere, Wikipedia) move to
+% the appendix.
+\begin{table}[t]
+  \caption{Fragmentation across data types and embedding models. \emph{hard} and
+           \emph{easy} are the bottom and top 10\% of queries by baseline graph
+           recall@10. The hard decile is more fragmented in every corpus, and the
+           gap survives at $10$M.}
+  \label{tab:coverage}
+  \small
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{llrrrrrrrrr}
+    \toprule
+    & & & & \multicolumn{2}{c}{recall@10} & \multicolumn{2}{c}{$\varphi_1$}
+        & \multicolumn{2}{c}{$\varphi_3$} & $\Pr[\varphi_3{=}1]$ \\
+    \cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}\cmidrule(lr){11-11}
+    corpus & dist. & $n$ & dim. & hard & easy & hard & easy & hard & easy & hard \\
+    \midrule
+    SIFT       & $L_2$ & 1{,}000{,}000 &  128 & 0.8395 & 1.0000 & 6.99 & 2.96 & 1.11 & 1.00 & 0.902 \\
+    GloVe      & ang.  & 1{,}183{,}514 &  100 & 0.2669 & 1.0000 & \textbf{9.39} & 2.53 & \textbf{5.24} & 1.00 & \textbf{0.031} \\
+    DEEP-image & ang.  & 9{,}990{,}000 &   96 & 0.6721 & 1.0000 & 8.63 & 3.13 & 1.94 & 1.00 & 0.502 \\
+    OpenAI     & ang.  &   990{,}000 & 1536 & 0.7365 & 1.0000 & 6.37 & 2.42 & 1.65 & 1.00 & 0.567 \\
+    \bottomrule
+  \end{tabular}
+  \\[2pt]
+  \footnotesize
+  Every easy decile has $\varphi_3 \approx 1.00$: allowing a three-hop detour rejoins
+  an easy query's exact top-10 into a single component. The hard decile does not
+  rejoin. Five further corpora, including a 3072-dimensional OpenAI variant that is
+  indistinguishable from the 1536 one ($\varphi_3$ 1.64 vs.\ 1.65), are in the appendix.
+\end{table}

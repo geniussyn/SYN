@@ -1,0 +1,20 @@
+{
+  "msmarco-ar": {
+    "n_docs": 1000000,
+    "n_queries_sampled": 1000,
+    "drift_mean": 0.30179999999999996,
+    "drift_share_zero": 0.186,
+    "q_to_corpus_sim": 0.6578449606895447,
+    "corpus_to_itself_sim": 0.7846504582762718,
+    "gap": -0.1268054975867271
+  },
+  "msmarco-fr": {
+    "n_docs": 1000000,
+    "n_queries_sampled": 1000,
+    "drift_mean": 0.433,
+    "drift_share_zero": 0.1,
+    "q_to_corpus_sim": 0.7338768243789673,
+    "corpus_to_itself_sim": 0.7846504582762718,
+    "gap": -0.05077363389730449
+  }
+}

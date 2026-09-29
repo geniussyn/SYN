@@ -1,0 +1,43 @@
+% Single-threaded cost of each per-query hardness measure (Xeon 6442Y, 1 thread).
+% Every stage a user must actually run is charged, including the ground truth each
+% measure needs. Steiner figures use the -m 1 (HNSW) path of the authors' code, so the
+% measure runs on the same level-0 graph phi_1 is read from.
+\begin{table}[t]
+  \caption{Single-threaded cost of computing each per-query hardness measure
+           ($k{=}100$, HNSW $M{=}16$, ef$_C{=}200$). Each measure is charged for the
+           ground truth it requires. Steiner-hardness costs $4$--$59\times$ more than
+           $\varphi_1$, and $53$--$89\%$ of its bill is the $\delta_0$ calibration,
+           a stage $\varphi_1$ has no counterpart for.}
+  \label{tab:hardness-cost}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrr}
+    \toprule
+    & & \multicolumn{3}{c}{stage (s)} & \\
+    \cmidrule(lr){3-5}
+    corpus & measure & GT & $\delta_0$ & meas. & total (s) \\
+    \midrule
+    \multirow{3}{*}{\shortstack[l]{GloVe\\\scriptsize 10{,}000 q}}
+      & $\varphi_1$    &  76.5 &    --- &    33.0 & \textbf{109.5} \\
+      & LID, RC, $d_k$ &  85.5 &    --- & $<$0.5 &   85.5 \\
+      & Steiner ME     & 191.0 & 5{,}205 & 1{,}038 & \textbf{6{,}434} \\
+    \midrule
+    \multirow{3}{*}{\shortstack[l]{MSMARCO\\\scriptsize 6{,}980 q}}
+      & $\varphi_1$    & 199.0 &    --- &  24.6 & \textbf{223.6} \\
+      & LID, RC, $d_k$ & 203.1 &    --- & $<$0.5 &  203.1 \\
+      & Steiner ME     & 276.6 &  474.3 & 150.4 & \textbf{901.3} \\
+    \midrule
+    \multirow{3}{*}{\shortstack[l]{YouTube-1M\\\scriptsize 1{,}000 q}}
+      & $\varphi_1$    &  40.7 &   --- &   1.8 & \textbf{42.5} \\
+      & LID, RC, $d_k$ &  47.2 &   --- & $<$0.5 &  47.2 \\
+      & Steiner ME     &  55.8 & 931.4 &  59.3 & \textbf{1{,}046.5} \\
+    \bottomrule
+  \end{tabular}
+  \\[2pt]
+  \footnotesize
+  $\varphi_1$ and the distance measures need a top-$k$ / top-$2k$ ground truth;
+  Steiner-hardness needs a $50{,}000$-deep one ($100{,}000$ for GloVe, whose $\delta_0$
+  reaches rank $52{,}401$). Steiner figures are its minimum-effort algorithm on the same
+  HNSW level-0 graph as $\varphi_1$; on the MRNG the published measure is defined over,
+  the $\delta_0$ stage did not terminate in 19.5\,h, so these are a lower bound.
+\end{table}

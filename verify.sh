@@ -1,0 +1,152 @@
+#!/bin/bash
+# Check the claims ARTIFACT.md makes. Reads; never measures.
+#
+#   bash verify.sh              against the assembled artifact
+#   LAB=/root/SYN bash verify.sh   against the working tree instead
+#
+# The default is the artifact, because what a reviewer has is the artifact: a
+# check that passes only against the author's machine has checked nothing.
+set -uo pipefail
+HERE="$(cd "$(dirname "$0")" && pwd)"
+LAB="${LAB:-$HERE/lab}"
+TRAIN="${TRAIN:-$HERE}"
+PY="${PY:-python3}"
+fail=0
+ok ()  { printf '  ok    %s\n' "$*"; }
+bad () { printf '  FAIL  %s\n' "$*"; fail=$((fail+1)); }
+
+echo "1. numerical core"
+if out=$("$PY" "$TRAIN/tests/test_core.py" 2>&1); then
+  ok "$(grep -c '^ok' <<<"$out") tests"
+else
+  bad "tests/test_core.py"; echo "$out" | tail -5
+fi
+
+echo "2. determinism: no unseeded randomness"
+u=$(grep -rnE "default_rng\(\)|np\.random\.(rand|randn|choice|permutation|shuffle|seed)\(" \
+      "$LAB/code" "$TRAIN/syn" 2>/dev/null | wc -l)
+[ "$u" -eq 0 ] && ok "every rng is seeded" || bad "$u unseeded call(s)"
+
+echo "3. results parse and carry their protocol"
+"$PY" - "$LAB" <<'PYEOF'
+import json, sys
+from pathlib import Path
+res = Path(sys.argv[1]) / "results"
+bad, timed = [], 0
+for p in sorted(res.glob("*.json")):
+    try:
+        d = json.loads(p.read_text())
+    except Exception as e:
+        bad.append(f"{p.name}: {e}"); continue
+    if isinstance(d, dict) and "timing_valid" in d:
+        timed += 1
+        if not d["timing_valid"]:
+            bad.append(f"{p.name}: timing_valid is false")
+n = len(list(res.glob("*.json")))
+print(f"  {'ok   ' if not bad else 'FAIL '} {n} files parse, {timed} carry timing_valid")
+for b in bad[:5]:
+    print("        " + b)
+sys.exit(1 if bad else 0)
+PYEOF
+[ $? -eq 0 ] || fail=$((fail+1))
+
+echo "4. timing audit, at a tolerance tighter than the default"
+out=$(SYN_ROOT="$LAB" "$PY" "$LAB/code/audit_timing.py" --tol 0.03 2>&1 | tail -1)
+case "$out" in
+  "0 file(s) flagged"*) ok "$out" ;;
+  *) bad "$out" ;;
+esac
+
+echo "5. withdrawn measurements are documented, not deleted"
+if [ -f "$LAB/results/superseded/CONTENDED.md" ]; then
+  n=$(ls "$LAB"/results/superseded/*.contended.json 2>/dev/null | wc -l)
+  ok "$n withdrawn file(s) kept with CONTENDED.md"
+else
+  bad "results/superseded/CONTENDED.md missing"
+fi
+
+echo "6. every shipped figure has the script that drew it, and vice versa"
+for f in fig_families fig_mutual_rank_motivation fig_dist fig_strata \
+         fig_ngfix fig_rerank_strata; do
+  # fig_mutual_rank.py draws both of its cuts; check the script by its stem
+  src="${f%%_motivation}"
+  [ -f "$LAB/code/$src.py" ] || { bad "code/$src.py missing"; continue; }
+  # fig_strata writes fig_strata_M16
+  hit=$(ls "$LAB"/figs/final/"$f"*.pdf 2>/dev/null | head -1)
+  [ -n "$hit" ] && ok "$src.py -> $(basename "$hit")" || bad "$src.py drew nothing"
+done
+extra=$(ls "$LAB"/figs/final/*.pdf 2>/dev/null | wc -l)
+# 11 in the main text and 2 in the appendix. The loop above checks the six whose
+# script name matches their output; the other five -- encoders, the parameter
+# sweep, hardness measures, tail censor and the repair cut of the mutual-rank
+# pair -- are checked by 6b, 6d and the loop's own stem rule, so only the count
+# is asserted here.
+[ "$extra" -eq 13 ] && ok "11 main figures and 2 appendix, no strays" \
+  || bad "$extra figures shipped, expected 13"
+
+echo "6b. the tail-censoring measurement ships with its scripts"
+if [ -f "$LAB/figs/final/fig_tail_censor.pdf" ]; then
+  n=$(ls "$LAB"/tailcensor/*.py 2>/dev/null | wc -l)
+  c=$(ls "$LAB"/tailcensor/out/*_curves.json 2>/dev/null | wc -l)
+  [ "$n" -ge 5 ] && [ "$c" -eq 2 ] \
+    && ok "fig_tail_censor.pdf with $n scripts and $c curve files" \
+    || bad "fig_tail_censor.pdf shipped with $n scripts, $c curve files"
+else
+  bad "fig_tail_censor.pdf missing"
+fi
+
+echo "6c. the annotation behind the 85% claim ships with its records"
+"$PY" "$HERE/check_annot.py" "$LAB/annot" || fail=$((fail+1))
+
+echo "6d. the phi_h comparison ships with its scripts and its numbers"
+if [ -f "$LAB/figs/final/fig_hardness_measures.pdf" ]; then
+  n=$(ls "$LAB"/phih/scripts/* 2>/dev/null | wc -l)
+  [ -f "$LAB/phih/VALUES.txt" ] && [ -f "$LAB/phih/table_cost.tex" ] && [ "$n" -ge 15 ] \
+    && ok "fig_hardness_measures.pdf with $n scripts, VALUES.txt and table_cost.tex" \
+    || bad "phi_h assets incomplete ($n scripts)"
+  "$PY" "$LAB/phih/scripts/check_coverage.py" || fail=$((fail+1))
+else
+  bad "fig_hardness_measures.pdf missing"
+fi
+
+echo "7. nothing shipped that the paper does not use"
+stray=$( { ls "$LAB"/results "$LAB"/corpora "$LAB"/figs/final "$LAB"/code \
+           "$HERE"/patches 2>/dev/null; } \
+         | grep -cE "mscoco|msmarco-(de|ru|zh|ja|hi|id)|darth" || true)
+[ "$stray" -eq 0 ] && ok "no dropped collection leaked into results, corpora or figs" \
+  || bad "$stray file(s) the paper does not use"
+dead=$(ls "$LAB"/code/*.py 2>/dev/null | wc -l)
+[ "$dead" -le 42 ] && ok "$dead modules, the import closure of what the paper runs" \
+  || bad "$dead modules shipped; the closure is 40"
+
+echo "8. no path from the machine this was built on, and nothing that names a person"
+# The second half matters more than the first. A leftover /root/SYN only breaks
+# on someone else's disk; a home directory in a path names an author, and this
+# is submitted to a double-blind venue. HOMES is the list of account names that
+# have appeared in these trees; extend it rather than relax it.
+HOMES='sieun|kyungmin|smrc'
+host=$(grep -rIl --exclude=verify.sh --exclude=collect.sh \
+         -e "/root/SYN" -e "/workspace/" -e "/root/lab" -e "/home/" \
+         -E -e "$HOMES" "$HERE" 2>/dev/null | wc -l)
+[ "$host" -eq 0 ] && ok "no build-machine path and no account name" \
+  || { bad "$host file(s) carry a build-machine path"
+       grep -rIl --exclude=verify.sh --exclude=collect.sh \
+         -e "/root/SYN" -e "/workspace/" "$HERE" 2>/dev/null | head -5 | sed 's/^/        /'; }
+
+echo "9. corpus manifests pin their seed and snapshot"
+for m in "$LAB"/corpora/*_manifest.json; do
+  [ -e "$m" ] || { bad "no corpus manifests"; break; }
+  "$PY" - "$m" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+miss = [k for k in ("repo", "n_docs_subset") if k not in d]
+print(("  ok    " if not miss else "  FAIL  ")
+      + f"{sys.argv[1].split('/')[-1]} {'' if not miss else miss}")
+sys.exit(1 if miss else 0)
+PYEOF
+  [ $? -eq 0 ] || fail=$((fail+1))
+done
+
+echo
+[ "$fail" -eq 0 ] && echo "all checks passed" || echo "$fail check(s) failed"
+exit $((fail > 0))

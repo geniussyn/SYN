@@ -1,0 +1,234 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Hard-query annotation</title>
+<style>
+  :root { --bg:#fbfaf8; --fg:#1b1a18; --mut:#6b6660; --line:#ddd8d0; --acc:#7a4b2a;
+          --card:#fff; --warn:#a4331f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#17161a; --fg:#eceae6; --mut:#98928a; --line:#343036; --acc:#d9a273;
+            --card:#1f1e23; --warn:#e8836c; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.55 -apple-system,
+         BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; }
+  header { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+           padding:12px 20px; z-index:5 }
+  .row { display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+  main { max-width:1000px; margin:0 auto; padding:20px }
+  h1 { font-size:15px; margin:0; font-weight:600; letter-spacing:.01em }
+  .q { font-size:22px; font-weight:600; margin:18px 0 4px; }
+  .sub { color:var(--mut); font-size:12px }
+  .p { background:var(--card); border:1px solid var(--line); border-radius:8px;
+       padding:10px 12px; margin:8px 0; display:flex; gap:12px; align-items:flex-start }
+  .p.unset { border-color:var(--warn) }
+  .gsel { display:flex; flex-wrap:wrap; gap:3px; width:206px; flex:0 0 206px }
+  .gsel button { width:24px; height:24px; padding:0; border:1px solid var(--line);
+       background:transparent; color:var(--mut); border-radius:5px; cursor:pointer;
+       font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace }
+  .gsel button.on { background:var(--acc); border-color:var(--acc); color:var(--bg) }
+  .ptxt { flex:1; min-width:0 }
+  .pid { color:var(--mut); font:11px ui-monospace,Menlo,monospace }
+  fieldset { border:1px solid var(--line); border-radius:8px; margin:18px 0; padding:10px 14px }
+  legend { color:var(--mut); font-size:12px; padding:0 6px }
+  label.opt { display:block; padding:3px 0; cursor:pointer }
+  label.opt code { color:var(--acc); font-weight:600 }
+  textarea { width:100%; min-height:60px; background:var(--card); color:var(--fg);
+       border:1px solid var(--line); border-radius:6px; padding:8px; font:inherit; resize:vertical }
+  button.act { background:var(--acc); color:var(--bg); border:0; border-radius:6px;
+       padding:8px 16px; font:600 13px inherit; cursor:pointer }
+  button.gh { background:transparent; color:var(--fg); border:1px solid var(--line);
+       border-radius:6px; padding:7px 12px; font:13px inherit; cursor:pointer }
+  input[type=text] { background:var(--card); color:var(--fg); border:1px solid var(--line);
+       border-radius:6px; padding:6px 8px; font:inherit }
+  .msg { color:var(--warn); font-size:12px; min-height:16px }
+  .done { color:var(--acc) }
+</style>
+
+<header>
+  <div class="row">
+    <h1>Hard-query annotation</h1>
+    <span class="sub" id="gv"></span>
+    <span style="flex:1"></span>
+    <label class="sub">annotator <input type="text" id="who" size="4" placeholder="A1"></label>
+    <button class="gh" id="load">items…</button>
+    <input type="file" id="file" accept=".jsonl" hidden>
+    <button class="gh" id="resume">resume…</button>
+    <input type="file" id="rfile" accept=".jsonl" hidden>
+    <button class="gh" id="export">export</button>
+  </div>
+  <div class="row sub" style="margin-top:6px">
+    <span id="prog">no items loaded</span>
+    <button class="gh" id="prev">←</button>
+    <button class="gh" id="next">→</button>
+    <button class="gh" id="jump">first unfinished</button>
+  </div>
+</header>
+
+<main id="main">
+  <p class="sub">Open <code>items_pilot.jsonl</code> or <code>items_all.jsonl</code>.
+     Read <b>GUIDELINES.md</b> first. Passage order is shuffled per query — slot 1 is
+     not the top-ranked document. Work stays in this browser until you press
+     <b>export</b>; export often.</p>
+</main>
+
+<script>
+const LABELS = [
+  ["single_topic",      "대부분의 GT가 하나의 일관된 의미/주제를 이룸"],
+  ["genuine_polysemy",  "질의 자체에 둘 이상 자연스러운 해석이 있고, 둘 이상이 복수 문서로 지지됨"],
+  ["surface_collision", "표면형만 공유할 뿐, 일관된 다중 의미 해석을 이루지 않음"],
+  ["mixed",             "다의성과 표면형 충돌이 함께 존재해 하나로 못 고름"],
+  ["unclear",           "제공 정보만으로 신뢰성 있게 판단 불가"],
+];
+const GROUPS = ["A","B","C","D","E","F","G","H","I","J","U"];
+const GV = "v1.0";
+let items = [], cur = 0, rec = {};
+
+const key = () => "annot:" + (document.getElementById("who").value || "A?");
+const save = () => localStorage.setItem(key(), JSON.stringify(rec));
+function restore() {
+  try { rec = JSON.parse(localStorage.getItem(key()) || "{}"); } catch { rec = {}; }
+}
+
+function blank() { return { groups: Array(10).fill(null), label: null,
+                            confidence: null, rationale: "" }; }
+
+function render() {
+  const m = document.getElementById("main");
+  if (!items.length) return;
+  const it = items[cur];
+  const r = rec[it.query_id] || (rec[it.query_id] = blank());
+  document.getElementById("prog").textContent =
+    `${cur + 1} / ${items.length}   ·   done ${Object.values(rec).filter(ok).length}`;
+  document.getElementById("gv").textContent = "guideline " + GV;
+
+  m.innerHTML = `<div class="q"></div><div class="sub">query_id <span id="qid"></span>
+     · 문서 10개를 먼저 의미로 묶고, 그다음 라벨을 고르세요</div><div id="ps"></div>`;
+  m.querySelector(".q").textContent = it.query_text;
+  m.querySelector("#qid").textContent = it.query_id;
+
+  const ps = m.querySelector("#ps");
+  it.passages.forEach((p, i) => {
+    const d = document.createElement("div");
+    d.className = "p" + (r.groups[i] ? "" : " unset");
+    const sel = document.createElement("div"); sel.className = "gsel";
+    GROUPS.forEach(g => {
+      const b = document.createElement("button");
+      b.textContent = g; b.className = r.groups[i] === g ? "on" : "";
+      b.onclick = () => {
+        r.groups[i] = r.groups[i] === g ? null : g;
+        [...sel.children].forEach(x => x.className = x.textContent === r.groups[i] ? "on" : "");
+        d.className = "p" + (r.groups[i] ? "" : " unset");
+        save(); status();
+      };
+      sel.appendChild(b);
+    });
+    const t = document.createElement("div"); t.className = "ptxt";
+    const id = document.createElement("div"); id.className = "pid";
+    id.textContent = `slot ${p.slot} · id ${p.passage_id}` + (p.truncated ? " · truncated" : "");
+    const tx = document.createElement("div"); tx.textContent = p.text;
+    t.append(id, tx); d.append(sel, t); ps.appendChild(d);
+  });
+
+  const fs = document.createElement("fieldset");
+  fs.innerHTML = "<legend>전체 발생 원인</legend>";
+  LABELS.forEach(([v, desc]) => {
+    const l = document.createElement("label"); l.className = "opt";
+    const i = document.createElement("input");
+    i.type = "radio"; i.name = "lab"; i.checked = r.label === v;
+    i.onchange = () => { r.label = v; save(); status(); };
+    const c = document.createElement("code"); c.textContent = v;
+    const s = document.createElement("span"); s.className = "sub";
+    s.textContent = "  — " + desc;
+    l.append(i, " ", c, s); fs.appendChild(l);
+  });
+  m.appendChild(fs);
+
+  const cf = document.createElement("fieldset");
+  cf.innerHTML = "<legend>confidence</legend>";
+  ["high", "medium", "low"].forEach(v => {
+    const l = document.createElement("label"); l.className = "opt";
+    l.style.display = "inline-block"; l.style.marginRight = "18px";
+    const i = document.createElement("input");
+    i.type = "radio"; i.name = "cf"; i.checked = r.confidence === v;
+    i.onchange = () => { r.confidence = v; save(); status(); };
+    l.append(i, " ", v); cf.appendChild(l);
+  });
+  m.appendChild(cf);
+
+  const rf = document.createElement("fieldset");
+  rf.innerHTML = "<legend>brief_rationale — 무엇이 무엇과 겹치는지 1~2문장 (필수)</legend>";
+  const ta = document.createElement("textarea"); ta.value = r.rationale;
+  ta.oninput = () => { r.rationale = ta.value; save(); status(); };
+  rf.appendChild(ta); m.appendChild(rf);
+
+  const bar = document.createElement("div"); bar.className = "row";
+  const b = document.createElement("button"); b.className = "act";
+  b.textContent = "save & next →";
+  b.onclick = () => { save(); if (cur < items.length - 1) cur++; render(); };
+  const msg = document.createElement("span"); msg.id = "msg";
+  bar.append(b, msg); m.appendChild(bar);
+  status();
+}
+
+function status() {
+  const it = items[cur]; if (!it) return;
+  const r = rec[it.query_id], m = document.getElementById("msg");
+  if (m) { m.className = ok(r) ? "msg done" : "msg";
+           m.textContent = ok(r) ? "complete" : missing(r); }
+  document.getElementById("prog").textContent =
+    `${cur + 1} / ${items.length}   ·   done ${Object.values(rec).filter(ok).length}`;
+}
+
+function missing(r) {
+  const m = [];
+  if (r.groups.some(g => !g)) m.push(`그룹 미지정 ${r.groups.filter(g => !g).length}개`);
+  if (!r.label) m.push("라벨 없음");
+  if (!r.confidence) m.push("confidence 없음");
+  if (!r.rationale.trim()) m.push("rationale 없음");
+  return m.join(" · ");
+}
+const ok = r => r && !r.groups.some(g => !g) && r.label && r.confidence && r.rationale.trim();
+
+function attach(id, fid, fn) {
+  document.getElementById(id).onclick = () => document.getElementById(fid).click();
+  document.getElementById(fid).onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => fn(rd.result.split("\n").filter(x => x.trim()).map(JSON.parse));
+    rd.readAsText(f);
+  };
+}
+attach("load", "file", rows => { items = rows; cur = 0; restore(); render(); });
+attach("resume", "rfile", rows => {
+  restore();
+  rows.forEach(r => {
+    rec[r.query_id] = { groups: String(r.semantic_group_ids).split(","),
+      label: r.primary_label, confidence: r.confidence, rationale: r.brief_rationale || "" };
+  });
+  save(); render();
+});
+
+document.getElementById("who").oninput = () => { restore(); render(); };
+document.getElementById("prev").onclick = () => { if (cur) cur--; render(); };
+document.getElementById("next").onclick = () => { if (cur < items.length - 1) cur++; render(); };
+document.getElementById("jump").onclick = () => {
+  const i = items.findIndex(it => !ok(rec[it.query_id]));
+  cur = i < 0 ? items.length - 1 : i; render();
+};
+document.getElementById("export").onclick = () => {
+  const who = document.getElementById("who").value || "A?";
+  const now = new Date().toISOString();
+  const out = items.filter(it => ok(rec[it.query_id])).map(it => {
+    const r = rec[it.query_id];
+    return JSON.stringify({ query_id: it.query_id, query_text: it.query_text,
+      passage_ids_shuffled: it.passage_ids_shuffled, annotator_id: who,
+      semantic_group_ids: r.groups.join(","), primary_label: r.label,
+      confidence: r.confidence, brief_rationale: r.rationale.trim(),
+      timestamp: now, guideline_version: GV });
+  }).join("\n") + "\n";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([out], { type: "application/x-ndjson" }));
+  a.download = `records_${who}.jsonl`; a.click();
+};
+document.getElementById("who").value = "A1";
+restore();
+</script>

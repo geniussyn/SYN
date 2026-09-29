@@ -1,0 +1,42 @@
+{
+  "corpus": "msmarco-1m",
+  "repo": "BeIR/msmarco",
+  "eval_split": "dev",
+  "relevance_levels": [
+    1
+  ],
+  "graded_relevance": false,
+  "judged_per_query_mean": 1.0654727793696275,
+  "positives_per_query_mean": 1.0654727793696275,
+  "positives_per_query_median": 1.0,
+  "n_docs_original": 8841823,
+  "n_docs_subset": 1000000,
+  "n_judged_total": 7433,
+  "n_judged_in_corpus": 7433,
+  "n_judged_missing": 0,
+  "subset_seed": 20260809,
+  "n_core": 7433,
+  "n_fill": 992567,
+  "n_eval_queries": 6980,
+  "git_sha": "unknown",
+  "git_dirty": true,
+  "host_os": "Linux-6.17.0-14-generic-x86_64-with-glibc2.39",
+  "hardware": {
+    "cpu_count": 128,
+    "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "gpu_mem_gb": 102.0,
+    "gpu_capability": "12.0",
+    "cuda": "12.8",
+    "bf16_supported": true
+  },
+  "packages": {
+    "python": "3.12.3",
+    "numpy": "2.1.2",
+    "torch": "2.8.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "faiss": "1.14.1",
+    "pyarrow": "25.0.1"
+  },
+  "ts": "2026-09-21T04:55:37+0000"
+}

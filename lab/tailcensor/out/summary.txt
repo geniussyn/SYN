@@ -1,0 +1,106 @@
+
+### spacev  n=100,000,000 dim=100 nq=10000 space=l2 M=16 efC=200 k=10  build 54.0 min (24 thr)   reps=9, min-of-reps
+   ef | recall all   QPS all |  rec -1%      QPS | rec -10%      QPS |  QPS@equal rec  speedup
+----------------------------------------------------------------------------------------------
+   16 |     0.7225    9572.3 |   0.7283   9568.4 |   0.7740   9730.5 |         7406.6     1.29x
+   24 |     0.7765    7315.9 |   0.7827   7565.7 |   0.8295   7591.4 |         5205.1     1.41x
+   32 |     0.8091    6044.3 |   0.8153   6271.5 |   0.8617   6193.2 |         4094.4     1.48x
+   48 |     0.8496    4492.3 |   0.8559   4702.7 |   0.9010   4385.8 |         2700.6     1.66x
+   64 |     0.8731    3752.4 |   0.8796   3827.1 |   0.9235   3936.0 |         1856.5     2.02x
+   96 |     0.9010    2701.0 |   0.9076   2667.1 |   0.9449   2524.9 |         1178.2     2.29x
+  128 |     0.9171    2108.7 |   0.9237   1996.0 |   0.9569   2084.7 |          829.6     2.54x
+  192 |     0.9354    1465.1 |   0.9421   1492.9 |   0.9688   1622.1 |          533.1     2.75x
+  256 |     0.9465    1134.7 |   0.9531   1066.2 |   0.9761   1224.0 |          335.3     3.38x
+  384 |     0.9587     787.9 |   0.9649    747.3 |   0.9823    750.2 |          181.9     4.33x
+  512 |     0.9661     634.1 |   0.9719    588.2 |   0.9854    603.6 |            nan      nanx
+  768 |     0.9730     410.6 |   0.9779    433.6 |   0.9885    460.2 |            nan      nanx
+ 1024 |     0.9777     302.7 |   0.9817    300.0 |   0.9902    304.2 |            nan      nanx
+ 1536 |     0.9812     203.2 |   0.9849    203.0 |   0.9916    206.6 |            nan      nanx
+ 2048 |     0.9831     167.1 |   0.9865    154.5 |   0.9924    155.9 |            nan      nanx
+  iso-reported-recall price of censoring the tail (what the all-query set needs to match the censored mean recall):
+    ef=  16  -1%: recall 0.7225->0.7283  all-query needs ef~    17 ( 1.0x) ->  9301.1 q/s vs  9572.3 = 1.03x apparent speedup
+    ef=  16 -10%: recall 0.7225->0.7740  all-query needs ef~    24 ( 1.5x) ->  7406.6 q/s vs  9572.3 = 1.29x apparent speedup
+    ef=  24  -1%: recall 0.7765->0.7827  all-query needs ef~    25 ( 1.1x) ->  7053.9 q/s vs  7315.9 = 1.04x apparent speedup
+    ef=  24 -10%: recall 0.7765->0.8295  all-query needs ef~    39 ( 1.6x) ->  5205.1 q/s vs  7315.9 = 1.41x apparent speedup
+    ef=  32  -1%: recall 0.8091->0.8153  all-query needs ef~    34 ( 1.1x) ->  5777.5 q/s vs  6044.3 = 1.05x apparent speedup
+    ef=  32 -10%: recall 0.8091->0.8617  all-query needs ef~    56 ( 1.7x) ->  4094.4 q/s vs  6044.3 = 1.48x apparent speedup
+    ef=  48  -1%: recall 0.8496->0.8559  all-query needs ef~    52 ( 1.1x) ->  4278.9 q/s vs  4492.3 = 1.05x apparent speedup
+    ef=  48 -10%: recall 0.8496->0.9010  all-query needs ef~    96 ( 2.0x) ->  2700.6 q/s vs  4492.3 = 1.66x apparent speedup
+    ef=  64  -1%: recall 0.8731->0.8796  all-query needs ef~    70 ( 1.1x) ->  3477.4 q/s vs  3752.4 = 1.08x apparent speedup
+    ef=  64 -10%: recall 0.8731->0.9235  all-query needs ef~   148 ( 2.3x) ->  1856.5 q/s vs  3752.4 = 2.02x apparent speedup
+    ef=  96  -1%: recall 0.9010->0.9076  all-query needs ef~   108 ( 1.1x) ->  2441.7 q/s vs  2701.0 = 1.11x apparent speedup
+    ef=  96 -10%: recall 0.9010->0.9449  all-query needs ef~   245 ( 2.6x) ->  1178.2 q/s vs  2701.0 = 2.29x apparent speedup
+    ef= 128  -1%: recall 0.9171->0.9237  all-query needs ef~   148 ( 1.2x) ->  1848.1 q/s vs  2108.7 = 1.14x apparent speedup
+    ef= 128 -10%: recall 0.9171->0.9569  all-query needs ef~   363 ( 2.8x) ->   829.6 q/s vs  2108.7 = 2.54x apparent speedup
+    ef= 192  -1%: recall 0.9354->0.9421  all-query needs ef~   228 ( 1.2x) ->  1255.2 q/s vs  1465.1 = 1.17x apparent speedup
+    ef= 192 -10%: recall 0.9354->0.9688  all-query needs ef~   602 ( 3.1x) ->   533.1 q/s vs  1465.1 = 2.75x apparent speedup
+    ef= 256  -1%: recall 0.9465->0.9531  all-query needs ef~   319 ( 1.2x) ->   930.1 q/s vs  1134.7 = 1.22x apparent speedup
+    ef= 256 -10%: recall 0.9465->0.9761  all-query needs ef~   930 ( 3.6x) ->   335.3 q/s vs  1134.7 = 3.38x apparent speedup
+    ef= 384  -1%: recall 0.9587->0.9649  all-query needs ef~   489 ( 1.3x) ->   656.9 q/s vs   787.9 = 1.20x apparent speedup
+    ef= 384 -10%: recall 0.9587->0.9823  all-query needs ef~  1807 ( 4.7x) ->   181.9 q/s vs   787.9 = 4.33x apparent speedup
+    ef= 512  -1%: recall 0.9661->0.9719  all-query needs ef~   722 ( 1.4x) ->   438.7 q/s vs   634.1 = 1.45x apparent speedup
+    ef= 512 -10%: recall 0.9661->0.9854  beyond the all-query ladder (ef<=2048)
+    ef= 768  -1%: recall 0.9730->0.9779  all-query needs ef~  1043 ( 1.4x) ->   297.3 q/s vs   410.6 = 1.38x apparent speedup
+    ef= 768 -10%: recall 0.9730->0.9885  beyond the all-query ladder (ef<=2048)
+    ef=1024  -1%: recall 0.9777->0.9817  all-query needs ef~  1661 ( 1.6x) ->   192.7 q/s vs   302.7 = 1.57x apparent speedup
+    ef=1024 -10%: recall 0.9777->0.9902  beyond the all-query ladder (ef<=2048)
+    ef=1536  -1%: recall 0.9812->0.9849  beyond the all-query ladder (ef<=2048)
+    ef=1536 -10%: recall 0.9812->0.9916  beyond the all-query ladder (ef<=2048)
+    ef=2048  -1%: recall 0.9831->0.9865  beyond the all-query ladder (ef<=2048)
+    ef=2048 -10%: recall 0.9831->0.9924  beyond the all-query ladder (ef<=2048)
+  timing spread (max/min-1) over all 45 timed batches: median 9.2%  p90 14.6%
+  ef=128: all 0.9171 | hardest 1% 0.2630 | hardest 10% 0.5588 | zero-recall queries 179
+  ef=2048: all 0.9831 | hardest 1% 0.6440 | hardest 10% 0.8992 | zero-recall queries 4
+
+### youtube  n=15,686,309 dim=1024 nq=1000 space=ip M=16 efC=200 k=10  build 15.6 min (24 thr)   reps=9, min-of-reps
+   ef | recall all   QPS all |  rec -1%      QPS | rec -10%      QPS |  QPS@equal rec  speedup
+----------------------------------------------------------------------------------------------
+   16 |     0.8606    5224.7 |   0.8654   5152.2 |   0.9040   5289.6 |         3873.1     1.35x
+   24 |     0.8959    4147.0 |   0.9010   4111.7 |   0.9378   4202.5 |         2607.5     1.59x
+   32 |     0.9160    3500.3 |   0.9211   3486.2 |   0.9574   3568.8 |         1765.3     1.98x
+   48 |     0.9346    2735.5 |   0.9399   2728.3 |   0.9744   2788.2 |          656.2     4.17x
+   64 |     0.9480    2235.0 |   0.9534   2239.0 |   0.9838   2288.8 |          180.1    12.41x
+   96 |     0.9586    1715.1 |   0.9641   1700.9 |   0.9883   1752.1 |            nan      nanx
+  128 |     0.9641    1349.5 |   0.9695   1346.7 |   0.9914   1380.6 |            nan      nanx
+  192 |     0.9693     972.0 |   0.9745    969.9 |   0.9942    992.1 |            nan      nanx
+  256 |     0.9726     759.5 |   0.9779    759.2 |   0.9947    710.4 |            nan      nanx
+  384 |     0.9770     535.9 |   0.9823    533.6 |   0.9958    546.3 |            nan      nanx
+  512 |     0.9791     412.8 |   0.9844    413.0 |   0.9972    423.1 |            nan      nanx
+  768 |     0.9810     249.3 |   0.9864    240.1 |   0.9977    283.5 |            nan      nanx
+ 1024 |     0.9836     184.0 |   0.9890    184.1 |   0.9978    191.9 |            nan      nanx
+ 1536 |     0.9854     148.1 |   0.9908    127.1 |   0.9983    127.5 |            nan      nanx
+ 2048 |     0.9855     100.7 |   0.9909    117.6 |   0.9983    122.1 |            nan      nanx
+  iso-reported-recall price of censoring the tail (what the all-query set needs to match the censored mean recall):
+    ef=  16  -1%: recall 0.8606->0.8654  all-query needs ef~    17 ( 1.1x) ->  5064.7 q/s vs  5224.7 = 1.03x apparent speedup
+    ef=  16 -10%: recall 0.8606->0.9040  all-query needs ef~    27 ( 1.7x) ->  3873.1 q/s vs  5224.7 = 1.35x apparent speedup
+    ef=  24  -1%: recall 0.8959->0.9010  all-query needs ef~    26 ( 1.1x) ->  3972.0 q/s vs  4147.0 = 1.04x apparent speedup
+    ef=  24 -10%: recall 0.8959->0.9378  all-query needs ef~    51 ( 2.1x) ->  2607.5 q/s vs  4147.0 = 1.59x apparent speedup
+    ef=  32  -1%: recall 0.9160->0.9211  all-query needs ef~    36 ( 1.1x) ->  3271.0 q/s vs  3500.3 = 1.07x apparent speedup
+    ef=  32 -10%: recall 0.9160->0.9574  all-query needs ef~    92 ( 2.9x) ->  1765.3 q/s vs  3500.3 = 1.98x apparent speedup
+    ef=  48  -1%: recall 0.9346->0.9399  all-query needs ef~    54 ( 1.1x) ->  2525.4 q/s vs  2735.5 = 1.08x apparent speedup
+    ef=  48 -10%: recall 0.9346->0.9744  all-query needs ef~   303 ( 6.3x) ->   656.2 q/s vs  2735.5 = 4.17x apparent speedup
+    ef=  64  -1%: recall 0.9480->0.9534  all-query needs ef~    79 ( 1.2x) ->  1951.3 q/s vs  2235.0 = 1.15x apparent speedup
+    ef=  64 -10%: recall 0.9480->0.9838  all-query needs ef~  1066 (16.7x) ->   180.1 q/s vs  2235.0 = 12.41x apparent speedup
+    ef=  96  -1%: recall 0.9586->0.9641  all-query needs ef~   128 ( 1.3x) ->  1346.0 q/s vs  1715.1 = 1.27x apparent speedup
+    ef=  96 -10%: recall 0.9586->0.9883  beyond the all-query ladder (ef<=2048)
+    ef= 128  -1%: recall 0.9641->0.9695  all-query needs ef~   195 ( 1.5x) ->   957.9 q/s vs  1349.5 = 1.41x apparent speedup
+    ef= 128 -10%: recall 0.9641->0.9914  beyond the all-query ladder (ef<=2048)
+    ef= 192  -1%: recall 0.9693->0.9745  all-query needs ef~   306 ( 1.6x) ->   651.0 q/s vs   972.0 = 1.49x apparent speedup
+    ef= 192 -10%: recall 0.9693->0.9942  beyond the all-query ladder (ef<=2048)
+    ef= 256  -1%: recall 0.9726->0.9779  all-query needs ef~   433 ( 1.7x) ->   480.5 q/s vs   759.5 = 1.58x apparent speedup
+    ef= 256 -10%: recall 0.9726->0.9947  beyond the all-query ladder (ef<=2048)
+    ef= 384  -1%: recall 0.9770->0.9823  all-query needs ef~   889 ( 2.3x) ->   213.6 q/s vs   535.9 = 2.51x apparent speedup
+    ef= 384 -10%: recall 0.9770->0.9958  beyond the all-query ladder (ef<=2048)
+    ef= 512  -1%: recall 0.9791->0.9844  all-query needs ef~  1239 ( 2.4x) ->   166.2 q/s vs   412.8 = 2.48x apparent speedup
+    ef= 512 -10%: recall 0.9791->0.9972  beyond the all-query ladder (ef<=2048)
+    ef= 768  -1%: recall 0.9810->0.9864  beyond the all-query ladder (ef<=2048)
+    ef= 768 -10%: recall 0.9810->0.9977  beyond the all-query ladder (ef<=2048)
+    ef=1024  -1%: recall 0.9836->0.9890  beyond the all-query ladder (ef<=2048)
+    ef=1024 -10%: recall 0.9836->0.9978  beyond the all-query ladder (ef<=2048)
+    ef=1536  -1%: recall 0.9854->0.9908  beyond the all-query ladder (ef<=2048)
+    ef=1536 -10%: recall 0.9854->0.9983  beyond the all-query ladder (ef<=2048)
+    ef=2048  -1%: recall 0.9855->0.9909  beyond the all-query ladder (ef<=2048)
+    ef=2048 -10%: recall 0.9855->0.9983  beyond the all-query ladder (ef<=2048)
+  timing spread (max/min-1) over all 75 timed batches: median 12.0%  p90 47.8%
+  ef=128: all 0.9641 | hardest 1% 0.4300 | hardest 10% 0.7180 | zero-recall queries 11
+  ef=2048: all 0.9855 | hardest 1% 0.4500 | hardest 10% 0.8700 | zero-recall queries 6
