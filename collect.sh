@@ -23,6 +23,18 @@
 #                      paper shows them once. In the lab as
 #                      code/fig_crosslingual.py; the measurements it reads ship,
 #                      because fig_strata reads the same files.
+#   sweep_ablation     the four continuous knobs -- lambda_pull, tau_p, L and the
+#                      training-query count -- swept over thirteen points and
+#                      read index-free with screen_arm.py. All four panels are
+#                      flat: the untrained arm sits at phi-hat_1 2.34 and every
+#                      trained arm between 1.33 and 1.44, so the figure shows
+#                      that the repair is what training does rather than what a
+#                      knob is set to. True, and not worth a figure's space, so
+#                      the paper does not claim it. In the lab as
+#                      code/fig_sweep_ablation.py, work/ablation_sweep.sh and
+#                      results/screen_msmarco-1m__abl-*.json, with the fourteen
+#                      adapters in the training tree, ready if a reviewer asks
+#                      how sensitive the method is to its hyperparameters.
 #   anchor_locality    whether the gain is local to the 4,944 mined documents.
 #                      It is not -- queries whose target set contains none of
 #                      them improve 55.1% against 55.4% overall -- but the paper
@@ -153,7 +165,7 @@ MODULES="audit_timing build_mmarco encode_cache
          run_ngfix screen_arm strata_cell style
          annot_agree build_stability config_table
          fig_ablation fig_encoders
-         fig_sweep_ablation gold_loss"
+         gold_loss"
 for m in $MODULES; do
   [ -f "$LAB/code/$m.py" ] || { echo "  !! code/$m.py missing"; continue; }
   rewrite "$LAB/code/$m.py" > "$HERE/analysis/$m.py"
@@ -166,7 +178,7 @@ cp -r "$LAB"/cpp/third_party/. "$HERE"/native/third_party/   # hnswlib, header-o
 # machine, so `cd /root/SYN` becomes `cd "${SYN_ROOT:-$(...)}"` on the way in and
 # the two housekeeping lanes that only moved files between disks do not ship.
 for w in run_all queue ngfix ngfix_pool fever_sweeps crosslingual mmarco \
-         strata ablation ablation_sweep encoders tail4 tail5 tail6; do
+         strata ablation encoders tail4 tail5 tail6; do
   [ -f "$LAB/work/$w.sh" ] || continue
   sed -e 's|^cd /root/SYN$|cd "${SYN_ROOT:?set SYN_ROOT to the lab directory}"|' \
       -e 's|/root/SYN-artifact|"$ARTIFACT"|g' \
@@ -204,6 +216,14 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
       # the paper's main FEVER measurement and belong in the repository.
       *_fever__*-mini__*|*_fever__*-e5l__*|*_fever__*-gte__*|*_fever__*-qw4__*)
         continue ;;
+      # the hyperparameter sweep is not in the paper; its readouts go with it.
+      # The other screen_*.json stay: phi-hat_1 for the shipped arms is quoted
+      # in the text and screen_arm.py is how it is computed.
+      screen_*__abl-*) continue ;;
+      # and so do its arms' ground truth and hard deciles. abl-nopull is the
+      # exception: it is one of the three rows of the ablation table.
+      gt_*__abl-nopull_*|harddecile_*__abl-nopull.*) ;;
+      gt_*__abl-*|harddecile_*__abl-*) continue ;;
     esac
     cp -L "$f" "$HERE/results/"
   done
@@ -257,7 +277,7 @@ cp "$LAB"/tailcensor/out/*.json "$LAB"/tailcensor/out/*.npz \
 # ------------------------------------------------------------------ figures --
 for f in fig_families fig_dist fig_strata_M16 fig_ngfix fig_rerank_strata \
          fig_tail_censor fig_hardness_measures \
-         fig_sweep_ablation fig_encoders fig_mutual_rank_motivation \
+         fig_encoders fig_mutual_rank_motivation \
          fig_mutual_rank_repair \
          figA_ngfix_all figA_rerank_all; do
   for e in pdf png; do

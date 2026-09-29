@@ -93,13 +93,12 @@ for f in fig_families fig_mutual_rank_motivation fig_dist fig_strata \
   [ -n "$hit" ] && ok "$src.py -> $(basename "$hit")" || bad "$src.py drew nothing"
 done
 extra=$(ls "$FIGS"/*.pdf 2>/dev/null | wc -l)
-# 11 in the main text and 2 in the appendix. The loop above checks the six whose
-# script name matches their output; the other five -- encoders, the parameter
-# sweep, hardness measures, tail censor and the repair cut of the mutual-rank
-# pair -- are checked by 6b, 6d and the loop's own stem rule, so only the count
-# is asserted here.
-[ "$extra" -eq 13 ] && ok "11 main figures and 2 appendix, no strays" \
-  || bad "$extra figures shipped, expected 13"
+# 10 in the main text and 2 in the appendix. The loop above checks the six whose
+# script name matches their output; the other four -- encoders, hardness
+# measures, tail censor and the repair cut of the mutual-rank pair -- are checked
+# by 6b, 6d and the loop's own stem rule, so only the count is asserted here.
+[ "$extra" -eq 12 ] && ok "10 main figures and 2 appendix, no strays" \
+  || bad "$extra figures shipped, expected 12"
 
 echo "6b. the tail-censoring measurement ships with its scripts"
 if [ -f "$FIGS/fig_tail_censor.pdf" ]; then
