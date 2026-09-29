@@ -4,13 +4,30 @@
 #   bash verify.sh              against the assembled artifact
 #   LAB=/root/SYN bash verify.sh   against the working tree instead
 #
+# The lab keeps code/, figs/final/ and its side studies under one working root;
+# the repository lays them out as analysis/, figures/ and studies/. Both are
+# checked by the same script, so each directory is resolved once here rather
+# than spelled out at every use.
+#
 # The default is the artifact, because what a reviewer has is the artifact: a
 # check that passes only against the author's machine has checked nothing.
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-LAB="${LAB:-$HERE/lab}"
+LAB="${LAB:-$HERE}"
+# repository layout by default, lab layout when LAB points at the working tree
+if [ -d "$LAB/code" ]; then
+  CODE="$LAB/code"; FIGS="$LAB/figs/final"; PHIH="$LAB/phih"
+  ANNOT="$LAB/annot"; TAILC="$LAB/tailcensor"; TOOLS="$HERE"
+else
+  CODE="$LAB/analysis"; FIGS="$LAB/figures"; PHIH="$LAB/studies/hardness"
+  ANNOT="$LAB/studies/annotation"; TAILC="$LAB/studies/tail-censoring"
+  TOOLS="$HERE/tools"
+fi
 TRAIN="${TRAIN:-$HERE}"
 PY="${PY:-python3}"
+# the training package sits under src/ in the repository and at the root in the
+# training tree; either way it has to be importable without installing anything
+export PYTHONPATH="$TRAIN/src:$TRAIN${PYTHONPATH:+:$PYTHONPATH}"
 fail=0
 ok ()  { printf '  ok    %s\n' "$*"; }
 bad () { printf '  FAIL  %s\n' "$*"; fail=$((fail+1)); }
@@ -24,7 +41,7 @@ fi
 
 echo "2. determinism: no unseeded randomness"
 u=$(grep -rnE "default_rng\(\)|np\.random\.(rand|randn|choice|permutation|shuffle|seed)\(" \
-      "$LAB/code" "$TRAIN/syn" 2>/dev/null | wc -l)
+      "$CODE" "$TRAIN/syn" 2>/dev/null | wc -l)
 [ "$u" -eq 0 ] && ok "every rng is seeded" || bad "$u unseeded call(s)"
 
 echo "3. results parse and carry their protocol"
@@ -51,7 +68,7 @@ PYEOF
 [ $? -eq 0 ] || fail=$((fail+1))
 
 echo "4. timing audit, at a tolerance tighter than the default"
-out=$(SYN_ROOT="$LAB" "$PY" "$LAB/code/audit_timing.py" --tol 0.03 2>&1 | tail -1)
+out=$(SYN_ROOT="$LAB" "$PY" "$CODE/audit_timing.py" --tol 0.03 2>&1 | tail -1)
 case "$out" in
   "0 file(s) flagged"*) ok "$out" ;;
   *) bad "$out" ;;
@@ -70,12 +87,12 @@ for f in fig_families fig_mutual_rank_motivation fig_dist fig_strata \
          fig_ngfix fig_rerank_strata; do
   # fig_mutual_rank.py draws both of its cuts; check the script by its stem
   src="${f%%_motivation}"
-  [ -f "$LAB/code/$src.py" ] || { bad "code/$src.py missing"; continue; }
+  [ -f "$CODE/$src.py" ] || { bad "$(basename "$CODE")/$src.py missing"; continue; }
   # fig_strata writes fig_strata_M16
-  hit=$(ls "$LAB"/figs/final/"$f"*.pdf 2>/dev/null | head -1)
+  hit=$(ls "$FIGS"/"$f"*.pdf 2>/dev/null | head -1)
   [ -n "$hit" ] && ok "$src.py -> $(basename "$hit")" || bad "$src.py drew nothing"
 done
-extra=$(ls "$LAB"/figs/final/*.pdf 2>/dev/null | wc -l)
+extra=$(ls "$FIGS"/*.pdf 2>/dev/null | wc -l)
 # 11 in the main text and 2 in the appendix. The loop above checks the six whose
 # script name matches their output; the other five -- encoders, the parameter
 # sweep, hardness measures, tail censor and the repair cut of the mutual-rank
@@ -85,9 +102,9 @@ extra=$(ls "$LAB"/figs/final/*.pdf 2>/dev/null | wc -l)
   || bad "$extra figures shipped, expected 13"
 
 echo "6b. the tail-censoring measurement ships with its scripts"
-if [ -f "$LAB/figs/final/fig_tail_censor.pdf" ]; then
-  n=$(ls "$LAB"/tailcensor/*.py 2>/dev/null | wc -l)
-  c=$(ls "$LAB"/tailcensor/out/*_curves.json 2>/dev/null | wc -l)
+if [ -f "$FIGS/fig_tail_censor.pdf" ]; then
+  n=$(ls "$TAILC"/*.py 2>/dev/null | wc -l)
+  c=$(ls "$TAILC"/out/*_curves.json 2>/dev/null | wc -l)
   [ "$n" -ge 5 ] && [ "$c" -eq 2 ] \
     && ok "fig_tail_censor.pdf with $n scripts and $c curve files" \
     || bad "fig_tail_censor.pdf shipped with $n scripts, $c curve files"
@@ -96,26 +113,26 @@ else
 fi
 
 echo "6c. the annotation behind the 85% claim ships with its records"
-"$PY" "$HERE/check_annot.py" "$LAB/annot" || fail=$((fail+1))
+"$PY" "$TOOLS/check_annot.py" "$ANNOT" || fail=$((fail+1))
 
 echo "6d. the phi_h comparison ships with its scripts and its numbers"
-if [ -f "$LAB/figs/final/fig_hardness_measures.pdf" ]; then
-  n=$(ls "$LAB"/phih/scripts/* 2>/dev/null | wc -l)
-  [ -f "$LAB/phih/VALUES.txt" ] && [ -f "$LAB/phih/table_cost.tex" ] && [ "$n" -ge 15 ] \
+if [ -f "$FIGS/fig_hardness_measures.pdf" ]; then
+  n=$(ls "$PHIH"/scripts/* 2>/dev/null | wc -l)
+  [ -f "$PHIH/VALUES.txt" ] && [ -f "$PHIH/table_cost.tex" ] && [ "$n" -ge 15 ] \
     && ok "fig_hardness_measures.pdf with $n scripts, VALUES.txt and table_cost.tex" \
     || bad "phi_h assets incomplete ($n scripts)"
-  "$PY" "$LAB/phih/scripts/check_coverage.py" || fail=$((fail+1))
+  "$PY" "$PHIH/scripts/check_coverage.py" || fail=$((fail+1))
 else
   bad "fig_hardness_measures.pdf missing"
 fi
 
 echo "7. nothing shipped that the paper does not use"
-stray=$( { ls "$LAB"/results "$LAB"/corpora "$LAB"/figs/final "$LAB"/code \
+stray=$( { ls "$LAB"/results "$LAB"/corpora "$FIGS" "$CODE" \
            "$HERE"/patches 2>/dev/null; } \
          | grep -cE "mscoco|msmarco-(de|ru|zh|ja|hi|id)|darth" || true)
 [ "$stray" -eq 0 ] && ok "no dropped collection leaked into results, corpora or figs" \
   || bad "$stray file(s) the paper does not use"
-dead=$(ls "$LAB"/code/*.py 2>/dev/null | wc -l)
+dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
 [ "$dead" -le 42 ] && ok "$dead modules, the import closure of what the paper runs" \
   || bad "$dead modules shipped; the closure is 40"
 

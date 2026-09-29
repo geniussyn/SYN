@@ -3,17 +3,17 @@
 # exist because the two are easy to confuse when working in the same checkout.
 
 # inputs: regenerable, and far too large to version
-lab/emb/
-lab/corpora/*
-!lab/corpora/*_manifest.json
-lab/results/*.npz
-!lab/results/perquery_*.npz
-!lab/results/gt_msmarco-1m__*.npz
-!lab/results/harddecile_msmarco-1m__*.npz
+emb/
+corpora/*
+!corpora/*_manifest.json
+results/*.npz
+!results/perquery_*.npz
+!results/gt_msmarco-1m__*.npz
+!results/harddecile_msmarco-1m__*.npz
 
 # scratch that the lanes write
-lab/work/*.log
-lab/figs/**/DONE_*
+scripts/*.log
+figures/**/DONE_*
 **/__pycache__/
 *.pyc
 .ipynb_checkpoints/
@@ -22,7 +22,7 @@ lab/figs/**/DONE_*
 adapters/
 *.safetensors
 *.bin
-!lab/cpp/**
+!native/**
 
 # editor and OS
 .DS_Store

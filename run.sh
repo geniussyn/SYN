@@ -13,16 +13,17 @@ TRANSFER=""
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export SYN_TRAIN_ROOT="$HERE"
 PY="${PY:-python}"
+export PYTHONPATH="$HERE/src${PYTHONPATH:+:$PYTHONPATH}"
 MINE="$HERE/work/mine/$C"
 AD="$HERE/adapters/$C"
 EMB="$SYN_ROOT/emb/${C}__vanilla_docs.npy"
-ENC="$PY $SYN_ROOT/code/encode_cache.py --corpus $C --encoder bge-m3"
+ENC="$PY $SYN_ROOT/analysis/encode_cache.py --corpus $C --encoder bge-m3"
 
 # 1. corpus and the baseline arm
 [ -f "$SYN_ROOT/corpora/${C}_docs.txt" ] || \
   $PY -m syn.corpus --corpora "$C" --n-target 1000000 --out "$SYN_ROOT/corpora"
 [ -f "$EMB" ] || $ENC --arm vanilla
-$PY "$SYN_ROOT/code/gt.py" --corpus "$C" --arm vanilla -k 10
+$PY "$SYN_ROOT/analysis/gt.py" --corpus "$C" --arm vanilla -k 10
 
 # 2. train, or take an adapter zero-shot
 if [ -z "$TRANSFER" ]; then
@@ -40,12 +41,12 @@ fi
 
 # 3. the SYN arm, and the fp32 reference for each arm's own targets
 $ENC --arm syn --adapter "$TRANSFER"
-$PY "$SYN_ROOT/code/gt.py" --corpus "$C" --arm syn -k 10
+$PY "$SYN_ROOT/analysis/gt.py" --corpus "$C" --arm syn -k 10
 
 # 4. each arm on its OWN hard decile
 for ARM in vanilla syn; do
-  $PY "$SYN_ROOT/code/own_decile.py" --corpus "$C" --arm "$ARM"
-  $PY "$SYN_ROOT/code/run_cell.py" --corpus "$C" --arm "$ARM" \
+  $PY "$SYN_ROOT/analysis/own_decile.py" --corpus "$C" --arm "$ARM"
+  $PY "$SYN_ROOT/analysis/run_cell.py" --corpus "$C" --arm "$ARM" \
       -M 16 --efc 200 --stock-arm "$ARM" --tag __own_efc200 \
       --time-hard --ms-cap 64
 done

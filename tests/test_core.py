@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from syn.exact import neighbourhoods, topk          # noqa: E402
 from syn.pull import active_pairs                   # noqa: E402
 from syn.train import Regions, qradial              # noqa: E402

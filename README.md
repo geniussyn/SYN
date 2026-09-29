@@ -8,11 +8,11 @@ from the lab tree by `collect.sh`, which ships only what the paper uses, and
 checked by `verify.sh`.
 
 Start with **[ARTIFACT.md](ARTIFACT.md)** — what is here, how the three parts
-(`syn/`, `lab/`, `patches/`) relate, and how to regenerate a figure.
+(`src/syn/`, `analysis/`, `patches/`) relate, and how to regenerate a figure.
 
 ```sh
 ./verify.sh      # eleven structural checks over the assembled artifact
 ```
 
 Anonymized for double-blind review; see [ANONYMITY.md](ANONYMITY.md).
-Licensed under MIT, except `lab/cpp/third_party/` which carries its own.
+Licensed under MIT, except `native/third_party/` which carries its own.

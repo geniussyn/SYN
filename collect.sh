@@ -43,6 +43,31 @@
 #                      phi, which is already in the cell JSON and in the phi
 #                      distribution cache that the figure reads.
 #
+# LAYOUT. The lab tree keeps a working root with code/, results/, figs/ and
+# corpora/ under it, which is what the measurement scripts were written against
+# and what paths.py resolves. A repository is read, not worked in, so the
+# artifact lays the same content out the way a reader expects to find it:
+#
+#   lab/code      -> analysis/     the measurement modules
+#   lab/results   -> results/
+#   lab/figs/final-> figures/
+#   lab/corpora   -> corpora/      manifests only
+#   lab/cpp       -> native/
+#   lab/work      -> scripts/      the lanes that produced the results
+#   lab/tailcensor-> studies/tail-censoring/
+#   lab/phih      -> studies/hardness/
+#   lab/annot     -> studies/annotation/
+#   syn           -> src/syn/
+#   *.md          -> docs/         except README and LICENSE
+#   collect.sh    -> tools/
+#
+# Renaming a directory renames the paths inside the scripts that read it, so the
+# copy is not a plain cp: REWRITE below edits the four path literals the modules
+# use (ROOT/"figs"/"final", ROOT/"figs", ROOT/"code", and `code/` in the lanes)
+# as the files go in. Nothing else in a copied file is touched, and a smoke test
+# at the end runs a figure script from the assembled tree to prove the layout
+# resolves.
+#
 # The two lists below are computed, not remembered:
 #   - the modules are the transitive import closure of the entry points
 #   - the result globs are what a python audit hook recorded the ten figures and
@@ -52,13 +77,66 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 LAB="${LAB:-/root/SYN}"
 TRAIN="${TRAIN:-/root/SYN-train}"
 
-rm -rf "$HERE"/lab "$HERE"/syn "$HERE"/tests
-mkdir -p "$HERE"/{lab/code,lab/cpp,lab/work,lab/results,lab/figs/final,lab/corpora,lab/tailcensor/out,lab/annot,lab/phih/scripts,syn,tests}
+rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests}
+rm -rf "$HERE"/lab "$HERE"/syn      # the layout before the rename, if a clone has it
+mkdir -p "$HERE"/{analysis,native/third_party,scripts,results,figures,corpora} \
+         "$HERE"/studies/{tail-censoring/out,annotation,hardness/scripts} \
+         "$HERE"/{src/syn,tests}
+
+# Rewrite the path literals that the rename invalidates. Applied to every .py
+# and .sh copied out of the lab; the patterns are anchored so they cannot match
+# anything but a path.
+rewrite () {
+  sed -e 's|ROOT / "figs" / "final"|ROOT / "figures"|g' \
+      -e 's|ROOT / "figs"|ROOT / "figures"|g' \
+      -e 's|ROOT / "code"|ROOT / "analysis"|g' \
+      -e 's|\bcode/\([a-z_0-9]*\.py\)|analysis/\1|g' \
+      -e 's|figs/final|figures|g' \
+      -e 's|^    code/      this package|    analysis/  this package|' \
+      -e 's|^    figs/      everything|    figures/   everything|' "$1"
+}
 
 # ---------------------------------------------------------------- training ---
-cp "$TRAIN"/syn/*.py            "$HERE"/syn/
-cp "$TRAIN"/tests/*.py          "$HERE"/tests/
-cp "$TRAIN"/{run.sh,requirements.txt} "$HERE"/ 2>/dev/null || true
+cp "$TRAIN"/syn/*.py            "$HERE"/src/syn/
+# The tests import the package by name off the repository root, which is where
+# it used to sit; under src/ they need the one extra segment.
+for t in "$TRAIN"/tests/*.py; do
+  sed 's|Path(__file__).resolve().parents\[1\]|Path(__file__).resolve().parents[1] / "src"|' \
+      "$t" > "$HERE/tests/$(basename "$t")"
+done
+
+# Packaging metadata. The artifact is read more often than it is installed, but
+# a repository that cannot be installed is a directory, so this makes
+# `pip install -e .` work and names the src layout for the tools that look.
+cat > "$HERE/pyproject.toml" <<'TOML'
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "syn"
+version = "0.1.0"
+description = "Taming embedding models: the geometry behind hard queries in ANNS"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+TOML
+cp "$TRAIN"/requirements.txt "$HERE"/ 2>/dev/null || true
+# run.sh calls the measurement modules by path and imports the training package
+# by name, so it needs the rename and it needs src/ on the import path.
+if [ -f "$TRAIN/run.sh" ]; then
+  rewrite "$TRAIN/run.sh" \
+    | sed -e 's|^PY="${PY:-python}"|PY="${PY:-python}"\nexport PYTHONPATH="$HERE/src${PYTHONPATH:+:$PYTHONPATH}"|' \
+    > "$HERE/run.sh"
+  chmod +x "$HERE/run.sh"
+fi
 # .gitignore, LICENSE and ANONYMITY.md are the repository's own, not copies of
 # anything in the lab, so collect.sh leaves them alone; they are listed here so
 # that a reader of this script knows they are expected to exist.
@@ -77,11 +155,12 @@ MODULES="audit_timing build_mmarco encode_cache
          fig_ablation fig_encoders
          fig_sweep_ablation gold_loss"
 for m in $MODULES; do
-  cp "$LAB/code/$m.py" "$HERE/lab/code/" || echo "  !! code/$m.py missing"
+  [ -f "$LAB/code/$m.py" ] || { echo "  !! code/$m.py missing"; continue; }
+  rewrite "$LAB/code/$m.py" > "$HERE/analysis/$m.py"
 done
 
-cp "$LAB"/cpp/*.cpp "$LAB"/cpp/Makefile "$HERE"/lab/cpp/
-cp -r "$LAB"/cpp/third_party "$HERE"/lab/cpp/       # hnswlib, header-only, MIT
+cp "$LAB"/cpp/*.cpp "$LAB"/cpp/Makefile "$HERE"/native/
+cp -r "$LAB"/cpp/third_party/. "$HERE"/native/third_party/   # hnswlib, header-only, MIT
 
 # The lanes that produced the shipped results. They were written against this
 # machine, so `cd /root/SYN` becomes `cd "${SYN_ROOT:-$(...)}"` on the way in and
@@ -94,7 +173,10 @@ for w in run_all queue ngfix ngfix_pool fever_sweeps crosslingual mmarco \
       -e 's|/workspace/SYN-train|"${SYN_TRAIN:?set SYN_TRAIN to the training tree}"|g' \
       -e 's|/root/SYN-train|"${SYN_TRAIN:?set SYN_TRAIN to the training tree}"|g' \
       -e 's|/root/SYN|"$SYN_ROOT"|g' \
-      "$LAB/work/$w.sh" > "$HERE/lab/work/$w.sh"
+      "$LAB/work/$w.sh" > "$HERE/scripts/$w.sh.tmp"
+  rewrite "$HERE/scripts/$w.sh.tmp" > "$HERE/scripts/$w.sh"
+  rm -f "$HERE/scripts/$w.sh.tmp"
+  chmod +x "$HERE/scripts/$w.sh"
 done
 
 # ------------------------------------------------------------------ results --
@@ -123,13 +205,13 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
       *_fever__*-mini__*|*_fever__*-e5l__*|*_fever__*-gte__*|*_fever__*-qw4__*)
         continue ;;
     esac
-    cp -L "$f" "$HERE/lab/results/"
+    cp -L "$f" "$HERE/results/"
   done
 done
 
 # the withdrawn timings, with the note that condemns them
 if [ -d "$LAB/results/superseded" ]; then
-  cp -r "$LAB/results/superseded" "$HERE/lab/results/"
+  cp -r "$LAB/results/superseded" "$HERE/results/"
 fi
 
 # what each collection was cut from, and with which seed -- for the collections
@@ -138,7 +220,7 @@ fi
 # not measured end to end, so they do not ship either.
 for c in msmarco-1m fever nq quora msmarco-fr msmarco-ar msmarco-1m-trainpool; do
   [ -f "$LAB/corpora/${c}_manifest.json" ] \
-    && cp "$LAB/corpora/${c}_manifest.json" "$HERE/lab/corpora/"
+    && cp "$LAB/corpora/${c}_manifest.json" "$HERE/corpora/"
 done
 
 # -------------------------------------------------------------------- phi_h ---
@@ -149,8 +231,8 @@ done
 # from the environment and its corpora are not here. VALUES.txt carries every
 # number in the figure and table_cost.tex the cost table.
 cp "$LAB"/phih/*.md "$LAB"/phih/VALUES.txt "$LAB"/phih/*.tex \
-   "$LAB"/phih/coverage_values.json "$HERE"/lab/phih/
-cp "$LAB"/phih/scripts/*.py "$LAB"/phih/scripts/*.cpp "$HERE"/lab/phih/scripts/
+   "$LAB"/phih/coverage_values.json "$HERE"/studies/hardness/
+cp "$LAB"/phih/scripts/*.py "$LAB"/phih/scripts/*.cpp "$HERE"/studies/hardness/scripts/
 
 # -------------------------------------------------------------- annotation ---
 # The paper opens with "85% of hard queries arise because ...", which is a human
@@ -158,8 +240,8 @@ cp "$LAB"/phih/scripts/*.py "$LAB"/phih/scripts/*.cpp "$HERE"/lab/phih/scripts/
 # labels themselves. The guidelines the annotators worked from, the items they
 # were shown, every record they returned, and the tool they used all ship, so
 # the number can be recomputed and the labelling can be argued with.
-cp "$LAB"/annot/*.md "$LAB"/annot/*.jsonl "$LAB"/annot/*.json "$HERE"/lab/annot/
-cp "$LAB"/annot/annotate.html "$HERE"/lab/annot/ 2>/dev/null || true
+cp "$LAB"/annot/*.md "$LAB"/annot/*.jsonl "$LAB"/annot/*.json "$HERE"/studies/annotation/
+cp "$LAB"/annot/annotate.html "$HERE"/studies/annotation/ 2>/dev/null || true
 
 # --------------------------------------------------------------- tail censor --
 # A separate measurement on two much larger collections (SpaceV 100M, YouTube
@@ -168,9 +250,9 @@ cp "$LAB"/annot/annotate.html "$HERE"/lab/annot/ 2>/dev/null || true
 # its own curves, and the per-query arrays those curves were cut from. The base
 # vectors are not here -- SpaceV's is 10 GB of int8 -- and RESULTS.md says where
 # they come from and records the ground-truth audit.
-cp "$LAB"/tailcensor/*.py "$LAB"/tailcensor/RESULTS.md "$HERE"/lab/tailcensor/
+cp "$LAB"/tailcensor/*.py "$LAB"/tailcensor/RESULTS.md "$HERE"/studies/tail-censoring/
 cp "$LAB"/tailcensor/out/*.json "$LAB"/tailcensor/out/*.npz \
-   "$LAB"/tailcensor/out/summary.txt "$HERE"/lab/tailcensor/out/ 2>/dev/null || true
+   "$LAB"/tailcensor/out/summary.txt "$HERE"/studies/tail-censoring/out/ 2>/dev/null || true
 
 # ------------------------------------------------------------------ figures --
 for f in fig_families fig_dist fig_strata_M16 fig_ngfix fig_rerank_strata \
@@ -179,18 +261,32 @@ for f in fig_families fig_dist fig_strata_M16 fig_ngfix fig_rerank_strata \
          fig_mutual_rank_repair \
          figA_ngfix_all figA_rerank_all; do
   for e in pdf png; do
-    [ -f "$LAB/figs/final/$f.$e" ] && cp "$LAB/figs/final/$f.$e" "$HERE/lab/figs/final/"
+    [ -f "$LAB/figs/final/$f.$e" ] && cp "$LAB/figs/final/$f.$e" "$HERE/figures/"
   done
 done
 
 # --------------------------------------------------------------------- done --
+# docs/, tools/, README.md, LICENSE and the two shell scripts are the
+# repository's own and are versioned, not assembled; collect.sh does not touch
+# them. Everything it does write is listed in the rm -rf above, so a stale file
+# from an earlier campaign cannot survive an assembly.
+
+# --------------------------------------------------------------- smoke test --
+# A rename that misses a path literal produces a tree that looks right and
+# cannot run. Draw one figure from the assembled artifact -- fig_encoders reads
+# only result JSON, so it needs no embeddings -- and fail the assembly if the
+# layout does not resolve.
+( cd "$HERE" && SYN_ROOT="$HERE" python3 analysis/fig_encoders.py >/dev/null 2>&1 ) \
+  && echo "  smoke test: analysis/fig_encoders.py ran against the new layout" \
+  || echo "  !! smoke test FAILED: a path literal did not survive the rename"
+
 find "$HERE" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
 printf '\n%s\n' "assembled $(date -u +%Y-%m-%dT%H:%MZ)"
 printf '  %-14s %s\n' \
-  "lab/code"    "$(ls "$HERE"/lab/code    | wc -l) modules" \
-  "lab/results" "$(ls "$HERE"/lab/results | wc -l) files" \
-  "lab/figs"    "$(ls "$HERE"/lab/figs/final | wc -l) files" \
-  "lab/work"    "$(ls "$HERE"/lab/work    | wc -l) scripts" \
-  "syn + tests" "$(ls "$HERE"/syn "$HERE"/tests | grep -c '\.py$') files"
+  "analysis"    "$(ls "$HERE"/analysis | wc -l) modules" \
+  "results"     "$(ls "$HERE"/results  | wc -l) files" \
+  "figures"     "$(ls "$HERE"/figures  | wc -l) files" \
+  "scripts"     "$(ls "$HERE"/scripts  | wc -l) lanes" \
+  "src + tests" "$(ls "$HERE"/src/syn "$HERE"/tests | grep -c '\.py$') files"
 printf '  %-14s %s\n' "total" "$(du -sh --exclude=.git "$HERE" | cut -f1)"
