@@ -97,8 +97,14 @@ def main(M=16, efc=200):
         d = load(c, "vanilla", M, efc) or load(c, "syn", M, efc)
         if d:
             n = d["n_docs"]
-            sizes[c] = (f"{n/1e6:g}M" if n >= 1_000_000
-                        else f"{n/1e3:.0f}K")
+            # %g keeps every significant digit, which turns 8,841,823 into
+            # "8.84182M". A panel title wants the magnitude, not the count: one
+            # decimal, and no decimal at all when it would be ".0".
+            if n >= 1_000_000:
+                m = n / 1e6
+                sizes[c] = f"{m:.0f}M" if abs(m - round(m)) < 0.05 else f"{m:.1f}M"
+            else:
+                sizes[c] = f"{n/1e3:.0f}K"
     for ax, (c, lab) in zip(axes.ravel(), COLLS):
         for R in TARGETS:
             ax.axhline(R, color="0.55", lw=0.7, ls=(0, (1, 3)), zorder=1)
