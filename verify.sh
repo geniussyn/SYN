@@ -131,8 +131,12 @@ stray=$( { ls "$LAB"/results "$LAB"/corpora "$FIGS" "$CODE" \
 [ "$stray" -eq 0 ] && ok "no dropped collection leaked into results, corpora or figs" \
   || bad "$stray file(s) the paper does not use"
 dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
-[ "$dead" -le 42 ] && ok "$dead modules, the import closure of what the paper runs" \
-  || bad "$dead modules shipped; the closure is 40"
+# Raised to 43 when families_table.py and encoders_table.py were added: the
+# paper's Table 4 and Table 8 had no producing script, so their numbers could be
+# read but not recomputed. Both are entry points rather than imports, which is
+# why the count moves and the closure does not shrink.
+[ "$dead" -le 43 ] && ok "$dead modules, the import closure of what the paper runs" \
+  || bad "$dead modules shipped; the closure is 43"
 
 echo "8. no path from the machine this was built on, and nothing that names a person"
 # The second half matters more than the first. A leftover /root/SYN only breaks

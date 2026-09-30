@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 from paths import ROOT, RESULTS  # noqa: E402
 
-LAB = ROOT; RES = LAB / "results"; ANN = LAB / "annot"
+LAB = ROOT; RES = LAB / "results"; ANN = LAB / "studies" / "annotation"
 LABELS = ("single_topic", "genuine_polysemy", "surface_collision", "mixed", "unclear")
 # the k-means rule's four names, in the order frag_types.py emits them
 HEUR = ("coherent", "polysemous", "loose senses", "scattered")
@@ -148,7 +148,7 @@ def ari(ga, gb):
 # ---------------------------------------------------------------- report
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--a1", default=str(ANN / "records_main_A1.jsonl"))
+    ap.add_argument("--a1", default=str(ANN / "records_main_M1.jsonl"))
     ap.add_argument("--a2", default=str(ANN / "records_main_A2.jsonl"))
     ap.add_argument("--adjudicated", default=str(ANN / "records_adjudicated.jsonl"),
                     help="third annotator / consensus, disagreements only")
@@ -160,7 +160,7 @@ def main():
                          "separation it shows does not survive a rebuild of the "
                          "same embedding (see results/build_stability_*.json), "
                          "whereas phi_1 does. Kept for inspection.")
-    ap.add_argument("--single", action="store_true",
+    ap.add_argument("--single", action="store_true", default=True,
                     help="one annotator only (--a1): report shares and structure, "
                          "skip the agreement sections, which need a second pass")
     ap.add_argument("--out", default=str(RES / "annot_summary.json"))

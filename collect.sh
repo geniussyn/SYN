@@ -105,7 +105,15 @@ rewrite () {
       -e 's|\bcode/\([a-z_0-9]*\.py\)|analysis/\1|g' \
       -e 's|figs/final|figures|g' \
       -e 's|^    code/      this package|    analysis/  this package|' \
-      -e 's|^    figs/      everything|    figures/   everything|' "$1"
+      -e 's|^    figs/      everything|    figures/   everything|' \
+      -e 's|LAB / "annot"|LAB / "studies" / "annotation"|g' \
+      -e 's|ROOT / "annot"|ROOT / "studies" / "annotation"|g' \
+      -e 's|LAB / "tailcensor"|LAB / "studies" / "tail-censoring"|g' \
+      -e 's|ROOT / "tailcensor"|ROOT / "studies" / "tail-censoring"|g' \
+      -e 's|LAB / "phih"|LAB / "studies" / "hardness"|g' \
+      -e 's|ROOT / "phih"|ROOT / "studies" / "hardness"|g' \
+      -e 's|records_main_A1\.jsonl|records_main_M1.jsonl|' \
+      -e 's|"--single", action="store_true"|"--single", action="store_true", default=True|' "$1"
 }
 
 # ---------------------------------------------------------------- training ---
@@ -160,7 +168,7 @@ MODULES="audit_timing build_mmarco encode_cache
          fig_ngfix fig_rerank_strata fig_strata fig_sweep
          goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
-         ivf_table sweep_table
+         ivf_table sweep_table families_table encoders_table
          paths rerank_pipeline rerank_strata run_cell run_family
          run_ngfix screen_arm strata_cell style
          annot_agree build_stability config_table
@@ -204,6 +212,8 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
          "ivf_table.tex" "sweep_table.tex" \
          "mutual_rank_panels*.json" "annot_summary.json" \
          "measured_speedup_*.json" "ngfix_pool_*.json" \
+         "families_table.tex" "encoders_table.tex" \
+         "frag_types.npz" \
          "perquery_*.npz" "gt_msmarco-1m__*.npz" "harddecile_msmarco-1m__*.npz"; do
   for f in "$LAB"/results/$g; do
     [ -e "$f" ] || continue
