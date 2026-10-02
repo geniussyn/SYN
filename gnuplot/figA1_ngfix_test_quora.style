@@ -1,0 +1,6 @@
+# style of each index block, as the figure module defines it
+# block	label	colour	dashtype	pointtype
+0	Vanilla / no repair	#EA3323	2	7
+1	Vanilla / HNSW-NGFix	#EA3323	1	3
+2	SYN / no repair	#0000F5	2	7
+3	SYN / HNSW-NGFix	#0000F5	1	3

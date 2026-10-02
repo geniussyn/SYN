@@ -38,6 +38,25 @@ TAILC = ROOT / "studies" / "tail-censoring" / "out"
 PHIH = ROOT / "studies" / "hardness"
 
 
+# matplotlib's style vocabulary, in gnuplot's. The figure modules own the
+# encoding -- which dimension is colour and which is the line -- so it is read
+# from them rather than re-decided here, and a `.style` file travels beside
+# every curve TSV saying what each block should look like.
+DT = {"-": 1, "--": 2, ":": 3, "-.": 4, "solid": 1, "dashed": 2}
+PT = {"o": 7, "s": 5, "^": 9, "D": 13, "P": 11, "X": 3, "v": 10, "+": 1, None: 7}
+
+
+def write_style(path, rows):
+    """rows: [(label, colour, linestyle, marker), ...] in block order."""
+    with path.open("w") as fh:
+        fh.write("# style of each index block, as the figure module defines it\n")
+        fh.write("# block\tlabel\tcolour\tdashtype\tpointtype\n")
+        for i, (lab, col, ls, mk) in enumerate(rows):
+            fh.write(f"{i}\t{lab}\t{col}\t{DT.get(ls, 1)}\t{PT.get(mk, 7)}\n")
+    return path
+
+
+
 def mod(name):
     return importlib.import_module(name)
 
@@ -64,20 +83,22 @@ def fig5_strata():
     m = mod("fig_strata")
     out = []
     for corpus, label in m.COLLS:
-        blocks = []
-        for arm, alab, _ in m.ARMS:
+        blocks, style = [], []
+        for arm, alab, acol in m.ARMS:
             d = m.load(corpus, arm)
             if not d:
                 continue
-            for key, slab, *_ in m.STRATA:
+            for key, slab, ls, mk, _ in m.STRATA:
                 g = (d.get("strata") or {}).get(key)
                 if not g:
                     continue
                 blocks.append((f"{alab} / {slab}",
                                [(r["ms"], r["recall"]) for r in g["grid"]]))
+                style.append((f"{alab} / {slab}", acol, ls, mk))
         if not blocks:
             continue
         d = m.load(corpus, "vanilla")
+        write_style(OUT / f"fig5_strata_{corpus}.style", style)
         out.append(write_curves(
             OUT / f"fig5_strata_{corpus}.tsv",
             [f"{label}: recall@10 against search time, by difficulty stratum",
@@ -94,13 +115,15 @@ def fig6_families():
     out = []
     for pop, plab in m.POPS:
         for corpus, label in m.COLLS:
-            blocks = []
-            for fam, flab, *_ in m.FAMILIES:
-                for arm, alab, *_ in m.ARMS:
+            blocks, style = [], []
+            for fam, flab, fcol, fmk in m.FAMILIES:
+                for arm, alab, als, _ in m.ARMS:
                     g, _ = m.series(fam, corpus, arm, m.TAG, pop)
                     if g:
                         blocks.append((f"{flab} / {alab}", g))
+                        style.append((f"{flab} / {alab}", fcol, als, fmk))
             if blocks:
+                write_style(OUT / f"fig6_families_{pop}_{corpus}.style", style)
                 out.append(write_curves(
                     OUT / f"fig6_families_{pop}_{corpus}.tsv",
                     [f"{label}, {plab}: four index families at the smallest degree",
@@ -115,9 +138,9 @@ def fig7_build_cost():
     m = mod("fig_build_cost")
     out = []
     for corpus, label in m.COLLS:
-        blocks = []
-        for ms, blab, *_ in m.BUDGETS:
-            for arm, alab, _ in m.ARMS:
+        blocks, style = [], []
+        for bi, (ms, blab, bmk) in enumerate(m.BUDGETS):
+            for arm, alab, acol in m.ARMS:
                 pts = []
                 for M in m.MS_SWEEP:
                     g, _ = m.cell(corpus, arm, M)
@@ -128,7 +151,10 @@ def fig7_build_cost():
                         pts.append((M, r))
                 if len(pts) > 1:
                     blocks.append((f"{alab} / budget {blab}", pts))
+                    style.append((f"{alab} / budget {blab}", acol,
+                                  "-" if bi == 0 else "--", bmk))
         if blocks:
+            write_style(OUT / f"fig7_build_recall_{corpus}.style", style)
             out.append(write_curves(
                 OUT / f"fig7_build_recall_{corpus}.tsv",
                 [f"{label}: hard-decile recall@10 reachable within a time budget,",
@@ -171,9 +197,9 @@ def fig8_rerank():
     out = []
     for corpus, label in m.ALL_COLLS:
         for mkey, mlab in m.ALL_METRICS:
-            blocks = []
-            for arm, alab, _ in m.ARMS:
-                for suf, slab, *_ in m.STRATA:
+            blocks, style = [], []
+            for arm, alab, acol in m.ARMS:
+                for suf, slab, sls, smk, _ in m.STRATA:
                     p = RES / f"rerank_pipeline{suf}_{corpus}.json"
                     if not p.exists():
                         continue
@@ -184,7 +210,9 @@ def fig8_rerank():
                     if rows:
                         blocks.append((f"{alab} / {slab}",
                                        [(r["ms_total"], r[mkey]) for r in rows]))
+                        style.append((f"{alab} / {slab}", acol, sls, smk))
             if blocks:
+                write_style(OUT / f"fig8_rerank_{corpus}_{mkey}.style", style)
                 out.append(write_curves(
                     OUT / f"fig8_rerank_{corpus}_{mkey}.tsv",
                     [f"{label}: {mlab} after reranking, against search+rerank time",
@@ -198,13 +226,15 @@ def fig9_encoders():
     m = mod("fig_encoders")
     out = []
     for corpus, label in m.COLLS:
-        blocks = []
-        for suf, elab, dim, *_ in m.ENCODERS:
-            for arm, alab, *_ in m.ARMS:
+        blocks, style = [], []
+        for suf, elab, dim, ecol, emk in m.ENCODERS:
+            for arm, alab, als, _ in m.ARMS:
                 g = m.series(corpus, f"{arm}{suf}", "hard")
                 if g:
                     blocks.append((f"{elab} ({dim}d) / {alab}", g))
+                    style.append((f"{elab} ({dim}d) / {alab}", ecol, als, emk))
         if blocks:
+            write_style(OUT / f"fig9_encoders_{corpus}.style", style)
             out.append(write_curves(
                 OUT / f"fig9_encoders_{corpus}.tsv",
                 [f"{label}: five encoders, hard decile, HNSW M=8 efC=200",
@@ -220,18 +250,20 @@ def figA1_ngfix():
     out = []
     for pop, plab in m.POPS:
         for corpus, label in m.ALL_COLLS:
-            blocks = []
-            for arm, alab, _ in m.ARMS:
+            blocks, style = [], []
+            for arm, alab, acol in m.ARMS:
                 p = RES / f"ngfix_{corpus}__{arm}.json"
                 if not p.exists():
                     continue
                 d = json.loads(p.read_text())
-                for key, klab, *_ in m.STAGES:
+                for key, klab, kls, kmk, _ in m.STAGES:
                     g = (d.get("grids") or {}).get(key, {}).get(pop)
                     if g:
                         blocks.append((f"{alab} / {klab}",
                                        [(x["ms"], x["recall"]) for x in g]))
+                        style.append((f"{alab} / {klab}", acol, kls, kmk))
             if blocks:
+                write_style(OUT / f"figA1_ngfix_{pop}_{corpus}.style", style)
                 out.append(write_curves(
                     OUT / f"figA1_ngfix_{pop}_{corpus}.tsv",
                     [f"{label}, {plab}: SYN composed with index-side repair",

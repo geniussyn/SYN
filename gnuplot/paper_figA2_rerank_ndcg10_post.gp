@@ -10,7 +10,7 @@ set offsets graph 0.03, graph 0.03, graph 0.05, graph 0.02
 set key off
 
 set logscale x
-set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 1,4 margins 0.06,0.99,0.28,0.90 spacing 0.05,0.09
 
 set title "MS MARCO 1M" font ",8" offset 0,-0.4
@@ -18,42 +18,42 @@ set xlabel "search + rerank time per query (ms)"
 set ylabel "nDCG@10"
 set key off
 plot \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_msmarco-1m_ndcg10_post.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "FEVER 1M" font ",8" offset 0,-0.4
 set xlabel "search + rerank time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_fever_ndcg10_post.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig8_rerank_fever_ndcg10_post.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_fever_ndcg10_post.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "NQ 1M" font ",8" offset 0,-0.4
 set xlabel "search + rerank time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_nq_ndcg10_post.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig8_rerank_nq_ndcg10_post.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_nq_ndcg10_post.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "Quora 523K" font ",8" offset 0,-0.4
 set xlabel "search + rerank time per query (ms)"
@@ -61,19 +61,19 @@ unset ylabel
 set key off
 set key on
 plot \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig8_rerank_quora_ndcg10_post.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "all query", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "hard decile", \
-  1/0 with lines lw 1.5 dt 4 lc rgb "#707070" title "5th pct", \
-  1/0 with lines lw 1.5 dt 5 lc rgb "#707070" title "1st pct", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "fig8_rerank_quora_ndcg10_post.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig8_rerank_quora_ndcg10_post.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  1/0 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 lc rgb "#EA3323" title "all query", \
+  1/0 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 lc rgb "#EA3323" title "hard decile", \
+  1/0 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 lc rgb "#EA3323" title "5th pct", \
+  1/0 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 lc rgb "#EA3323" title "1st pct", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#EA3323" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#0000F5" title "SYN"
 
 unset multiplot

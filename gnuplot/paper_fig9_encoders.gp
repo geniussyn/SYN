@@ -11,7 +11,7 @@ set key off
 
 set logscale x
 set yrange [0.8:1.003]
-set key at screen 0.5,0.055 center bottom horizontal maxcols 3 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 3 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 1,1 margins 0.11,0.98,0.26,0.92 spacing 0.06,0.10
 
 set title "MS MARCO 1M, hard decile" font ",8" offset 0,-0.4
@@ -20,22 +20,22 @@ set ylabel "recall@10 (hard decile)"
 set key off
 set key on
 plot \
-  "fig9_encoders_msmarco-1m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 4 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 5 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 6 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 8 using 1:2 with lines lw 1.5 dt 3 lc rgb "#EA3323" notitle, \
-  "fig9_encoders_msmarco-1m.tsv" index 9 using 1:2 with lines lw 1.5 dt 3 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "MiniLM-L6 (384d)", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "BGE-M3 (1024d)", \
-  1/0 with lines lw 1.5 dt 4 lc rgb "#707070" title "E5-large (1024d)", \
-  1/0 with lines lw 1.5 dt 5 lc rgb "#707070" title "GTE-large (1024d)", \
-  1/0 with lines lw 1.5 dt 3 lc rgb "#707070" title "Qwen3-4B (2560d)", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "fig9_encoders_msmarco-1m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 9 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 1 pt 13 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 8 using 1:2 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 pi 2 lc rgb "#6A3D9A" notitle, \
+  "fig9_encoders_msmarco-1m.tsv" index 9 using 1:2 with linespoints lw 1.4 dt 1 pt 11 ps 0.32 pi 2 lc rgb "#6A3D9A" notitle, \
+  1/0 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 lc rgb "#2E7D32" title "MiniLM-L6 (384d)", \
+  1/0 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 lc rgb "#EA3323" title "BGE-M3 (1024d)", \
+  1/0 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 lc rgb "#0000F5" title "E5-large (1024d)", \
+  1/0 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 lc rgb "#D97706" title "GTE-large (1024d)", \
+  1/0 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 lc rgb "#6A3D9A" title "Qwen3-4B (2560d)", \
+  1/0 with lines lw 2.0 dt 2 lc rgb "#707070" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#707070" title "SYN"
 
 unset multiplot

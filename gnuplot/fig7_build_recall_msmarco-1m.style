@@ -1,0 +1,6 @@
+# style of each index block, as the figure module defines it
+# block	label	colour	dashtype	pointtype
+0	Vanilla / budget 1 ms	#EA3323	1	7
+1	SYN / budget 1 ms	#0000F5	1	7
+2	Vanilla / budget 5 ms	#EA3323	2	9
+3	SYN / budget 5 ms	#0000F5	2	9

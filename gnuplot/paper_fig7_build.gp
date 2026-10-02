@@ -11,7 +11,7 @@ set key off
 
 set logscale x 2
 set xtics ("8" 8, "16" 16, "32" 32)
-set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 1,2 margins 0.09,0.98,0.26,0.90 spacing 0.06,0.10
 
 set title "MS MARCO 1M" font ",8" offset 0,-0.4
@@ -19,10 +19,10 @@ set xlabel "HNSW degree M"
 set ylabel "recall@10 (hard decile)"
 set key off
 plot \
-  "fig7_build_recall_msmarco-1m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig7_build_recall_msmarco-1m.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig7_build_recall_msmarco-1m.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig7_build_recall_msmarco-1m.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle
+  "fig7_build_recall_msmarco-1m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig7_build_recall_msmarco-1m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig7_build_recall_msmarco-1m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig7_build_recall_msmarco-1m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "FEVER 1M" font ",8" offset 0,-0.4
 set xlabel "HNSW degree M"
@@ -30,13 +30,13 @@ unset ylabel
 set key off
 set key on
 plot \
-  "fig7_build_recall_fever.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig7_build_recall_fever.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig7_build_recall_fever.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig7_build_recall_fever.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "budget 1 ms", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "budget 5 ms", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "fig7_build_recall_fever.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig7_build_recall_fever.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig7_build_recall_fever.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig7_build_recall_fever.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  1/0 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 lc rgb "#EA3323" title "budget 1 ms", \
+  1/0 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 lc rgb "#EA3323" title "budget 5 ms", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#EA3323" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#0000F5" title "SYN"
 
 unset multiplot

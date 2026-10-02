@@ -312,9 +312,13 @@ done
 # to parse the result JSON. `make -C gnuplot check` rebuilds all of them.
 if [ -d "$LAB/export/gnuplot" ]; then
   mkdir -p "$HERE/gnuplot"
-  cp "$LAB"/export/gnuplot/*.tsv "$LAB"/export/gnuplot/*.gp \
-     "$LAB"/export/gnuplot/*.txt "$LAB"/export/gnuplot/Makefile \
-     "$HERE/gnuplot/" 2>/dev/null || true
+  # .style travels with the data: it is the figure module's own encoding --
+  # which dimension is colour and which is the line -- and without it a
+  # redrawing has to guess, which is how four index families first came out
+  # in two colours.
+  cp "$LAB"/export/gnuplot/*.tsv "$LAB"/export/gnuplot/*.style \
+     "$LAB"/export/gnuplot/*.gp "$LAB"/export/gnuplot/*.txt \
+     "$LAB"/export/gnuplot/Makefile "$HERE/gnuplot/" 2>/dev/null || true
 fi
 
 # --------------------------------------------------------------------- done --

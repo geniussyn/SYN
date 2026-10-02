@@ -11,7 +11,7 @@ set key off
 
 set logscale x
 set yrange [0.8:1.003]
-set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 1,4 margins 0.06,0.99,0.28,0.90 spacing 0.05,0.09
 
 set title "MS MARCO 1M" font ",8" offset 0,-0.4
@@ -19,42 +19,42 @@ set xlabel "search time per query (ms)"
 set ylabel "recall@10"
 set key off
 plot \
-  "fig6_families_hard_msmarco-1m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 4 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 5 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 6 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_msmarco-1m.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig6_families_hard_msmarco-1m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 1 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig6_families_hard_msmarco-1m.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 1 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle
 
 set title "FEVER 1M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "fig6_families_hard_fever.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_fever.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_fever.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_fever.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_fever.tsv" index 4 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_fever.tsv" index 5 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_fever.tsv" index 6 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_fever.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig6_families_hard_fever.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_fever.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_fever.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_fever.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_fever.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_fever.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 1 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_fever.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig6_families_hard_fever.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 1 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle
 
 set title "NQ 1M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "fig6_families_hard_nq.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_nq.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_nq.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_nq.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_nq.tsv" index 4 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_nq.tsv" index 5 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_nq.tsv" index 6 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_nq.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig6_families_hard_nq.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_nq.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_nq.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_nq.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_nq.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_nq.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 1 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_nq.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig6_families_hard_nq.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 1 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle
 
 set title "Quora 523K" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
@@ -62,19 +62,19 @@ unset ylabel
 set key off
 set key on
 plot \
-  "fig6_families_hard_quora.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_quora.tsv" index 1 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_quora.tsv" index 2 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_quora.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_quora.tsv" index 4 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_quora.tsv" index 5 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig6_families_hard_quora.tsv" index 6 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig6_families_hard_quora.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "HNSW", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "NSG", \
-  1/0 with lines lw 1.5 dt 4 lc rgb "#707070" title "IVF", \
-  1/0 with lines lw 1.5 dt 5 lc rgb "#707070" title "Vamana (DiskANN)", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "fig6_families_hard_quora.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_quora.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig6_families_hard_quora.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_quora.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig6_families_hard_quora.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_quora.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 1 pt 13 ps 0.32 pi 2 lc rgb "#2E7D32" notitle, \
+  "fig6_families_hard_quora.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  "fig6_families_hard_quora.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 1 pt 11 ps 0.32 pi 2 lc rgb "#D97706" notitle, \
+  1/0 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 lc rgb "#EA3323" title "HNSW", \
+  1/0 with linespoints lw 1.4 dt 2 pt 9 ps 0.32 lc rgb "#0000F5" title "NSG", \
+  1/0 with linespoints lw 1.4 dt 2 pt 13 ps 0.32 lc rgb "#2E7D32" title "IVF", \
+  1/0 with linespoints lw 1.4 dt 2 pt 11 ps 0.32 lc rgb "#D97706" title "Vamana (DiskANN)", \
+  1/0 with lines lw 2.0 dt 2 lc rgb "#707070" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#707070" title "SYN"
 
 unset multiplot

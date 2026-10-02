@@ -11,7 +11,7 @@ set key off
 
 set logscale x
 set yrange [0.3:1.003]
-set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 2,3 margins 0.07,0.99,0.19,0.94 spacing 0.06,0.10
 
 set title "MS MARCO 1M" font ",8" offset 0,-0.4
@@ -19,70 +19,70 @@ unset xlabel
 set ylabel "recall@10"
 set key off
 plot \
-  "fig5_strata_msmarco-1m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-1m.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig5_strata_msmarco-1m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-1m.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "FEVER 1M" font ",8" offset 0,-0.4
 unset xlabel
 unset ylabel
 set key off
 plot \
-  "fig5_strata_fever.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_fever.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_fever.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_fever.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_fever.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_fever.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_fever.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_fever.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig5_strata_fever.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_fever.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_fever.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_fever.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_fever.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_fever.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_fever.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_fever.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "NQ 1M" font ",8" offset 0,-0.4
 unset xlabel
 unset ylabel
 set key off
 plot \
-  "fig5_strata_nq.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig5_strata_nq.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_nq.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_nq.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_nq.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_nq.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_nq.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_nq.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_nq.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "Quora 523K" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 set ylabel "recall@10"
 set key off
 plot \
-  "fig5_strata_quora.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_quora.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_quora.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_quora.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_quora.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_quora.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_quora.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_quora.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig5_strata_quora.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_quora.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_quora.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_quora.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_quora.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_quora.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_quora.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_quora.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "mMARCO French 1M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "fig5_strata_msmarco-fr.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-fr.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle
+  "fig5_strata_msmarco-fr.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-fr.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "MS MARCO 8.8M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
@@ -90,19 +90,19 @@ unset ylabel
 set key off
 set key on
 plot \
-  "fig5_strata_msmarco-8m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 2 using 1:2 with lines lw 1.5 dt 4 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 3 using 1:2 with lines lw 1.5 dt 5 lc rgb "#EA3323" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 4 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 5 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 6 using 1:2 with lines lw 1.5 dt 4 lc rgb "#0000F5" notitle, \
-  "fig5_strata_msmarco-8m.tsv" index 7 using 1:2 with lines lw 1.5 dt 5 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "Avg", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "decile (worst 10%)", \
-  1/0 with lines lw 1.5 dt 4 lc rgb "#707070" title "5th pct (worst 5%)", \
-  1/0 with lines lw 1.5 dt 5 lc rgb "#707070" title "1st pct (worst 1%)", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "fig5_strata_msmarco-8m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_msmarco-8m.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  1/0 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 lc rgb "#EA3323" title "Avg", \
+  1/0 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 lc rgb "#EA3323" title "decile (worst 10%)", \
+  1/0 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 lc rgb "#EA3323" title "5th pct (worst 5%)", \
+  1/0 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 lc rgb "#EA3323" title "1st pct (worst 1%)", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#EA3323" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 1 lc rgb "#0000F5" title "SYN"
 
 unset multiplot

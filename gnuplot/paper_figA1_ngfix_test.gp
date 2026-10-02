@@ -11,7 +11,7 @@ set key off
 
 set logscale x
 set yrange [0.85:1.003]
-set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 1.8 spacing 1.1 font ",7"
+set key at screen 0.5,0.055 center bottom horizontal maxcols 4 samplen 2.4 spacing 1.1 font ",7"
 set multiplot layout 1,4 margins 0.06,0.99,0.28,0.90 spacing 0.05,0.09
 
 set title "MS MARCO 1M" font ",8" offset 0,-0.4
@@ -19,30 +19,30 @@ set xlabel "search time per query (ms)"
 set ylabel "recall@10"
 set key off
 plot \
-  "figA1_ngfix_test_msmarco-1m.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_msmarco-1m.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_msmarco-1m.tsv" index 2 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "figA1_ngfix_test_msmarco-1m.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle
+  "figA1_ngfix_test_msmarco-1m.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_msmarco-1m.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_msmarco-1m.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "figA1_ngfix_test_msmarco-1m.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "FEVER 1M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "figA1_ngfix_test_fever.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_fever.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_fever.tsv" index 2 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "figA1_ngfix_test_fever.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle
+  "figA1_ngfix_test_fever.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_fever.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_fever.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "figA1_ngfix_test_fever.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "NQ 1M" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
 unset ylabel
 set key off
 plot \
-  "figA1_ngfix_test_nq.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_nq.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_nq.tsv" index 2 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "figA1_ngfix_test_nq.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle
+  "figA1_ngfix_test_nq.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_nq.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_nq.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "figA1_ngfix_test_nq.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "Quora 523K" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
@@ -50,13 +50,13 @@ unset ylabel
 set key off
 set key on
 plot \
-  "figA1_ngfix_test_quora.tsv" index 0 using 1:2 with lines lw 1.5 dt 1 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_quora.tsv" index 1 using 1:2 with lines lw 1.5 dt 2 lc rgb "#EA3323" notitle, \
-  "figA1_ngfix_test_quora.tsv" index 2 using 1:2 with lines lw 1.5 dt 1 lc rgb "#0000F5" notitle, \
-  "figA1_ngfix_test_quora.tsv" index 3 using 1:2 with lines lw 1.5 dt 2 lc rgb "#0000F5" notitle, \
-  1/0 with lines lw 1.5 dt 1 lc rgb "#707070" title "no repair", \
-  1/0 with lines lw 1.5 dt 2 lc rgb "#707070" title "HNSW-NGFix", \
-  1/0 with lines lw 2.2 lc rgb "#EA3323" title "Vanilla", \
-  1/0 with lines lw 2.2 lc rgb "#0000F5" title "SYN"
+  "figA1_ngfix_test_quora.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_quora.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "figA1_ngfix_test_quora.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "figA1_ngfix_test_quora.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  1/0 with linespoints lw 1.4 dt 2 pt 7 ps 0.32 lc rgb "#EA3323" title "no repair", \
+  1/0 with linespoints lw 1.4 dt 1 pt 3 ps 0.32 lc rgb "#EA3323" title "HNSW-NGFix", \
+  1/0 with lines lw 2.0 dt 2 lc rgb "#EA3323" title "Vanilla", \
+  1/0 with lines lw 2.0 dt 2 lc rgb "#0000F5" title "SYN"
 
 unset multiplot
