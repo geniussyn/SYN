@@ -1,0 +1,18 @@
+{
+  "corpus": "msmarco-1m",
+  "arm": "gf-nicdm",
+  "M": 16,
+  "maxM0": 32,
+  "k": 10,
+  "n_queries": 1000,
+  "query_seed": 777,
+  "asymmetric": true,
+  "phi1_hat": 4.576,
+  "pr_phi1_hat_eq_1": 0.095,
+  "median_mutual_rank": 342.0,
+  "pair_within_maxM0": 0.20855555555555555,
+  "exhaustive_mrr10": 0.49679960317460314,
+  "exhaustive_ndcg10": 0.5313309455282299,
+  "exhaustive_gold10": 0.655,
+  "note": "phi1_hat as in screen_arm.py. For an asymmetric correction the document-to-document ranks are read in key/val form, which is the correction's own definition and more favourable than any index can realise."
+}

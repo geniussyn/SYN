@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from paths import ROOT, cell_path                                # noqa: E402
+from paths import ROOT, cell_or_strata                           # noqa: E402
 
 RES = ROOT / "results"
 # named the way the per-stratum figure names them: the worst 20 / 10 / 5 / 1
@@ -79,7 +79,7 @@ def main():
     for arm in a.arms.split(","):
         idx = stratum_index(a.corpus, arm, frac)
         pq = np.load(RES / f"rerank_pq_{a.corpus}__{arm}.npz")
-        cell = json.loads(cell_path(a.corpus, arm, a.M, a.efc, results=RES).read_text())
+        cell = cell_or_strata(a.corpus, arm, a.M, a.efc, results=RES)
         sp = RES / f"strata_{a.corpus}__{arm}__M{a.M}__strata_efc{a.efc}.json"
         strata = json.loads(sp.read_text()) if sp.exists() else None
         rows = []

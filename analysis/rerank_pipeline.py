@@ -36,7 +36,7 @@ from paths import EMB, ROOT                                          # noqa: E40
 LAB = ROOT; RES = LAB / "results"
 from index_hnsw import build, timed_grid                        # noqa: E402
 from metrics import mrr_at_k, ndcg_at_k, qrels_recall_at_k      # noqa: E402
-from paths import cell_path                                     # noqa: E402, ROOT
+from paths import cell_or_strata                                # noqa: E402, ROOT
 
 RERANKER = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 DEPTHS = (10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150)
@@ -113,7 +113,10 @@ def main():
         idx = np.arange(len(qs))
         qtext = [qs[i]["text"] for i in idx]
         rh = [rels[i] for i in idx]
-        cell = json.loads(cell_path(a.corpus, arm, a.M, a.efc, results=RES).read_text())
+        # An arm added for comparison may have no measured cell, only
+        # strata_cell.py's timing of the same grid. cell_or_strata reads
+        # whichever exists; see paths.py for why that is the same number.
+        cell = cell_or_strata(a.corpus, arm, a.M, a.efc, results=RES)
         Q = np.load(EMB / f"{a.corpus}__{arm}_queries.npy").astype(np.float32)
         ip = Path("/dev/shm/synidx") / f"rr_{a.corpus}__{arm}__M{a.M}.bin"
         ip.parent.mkdir(parents=True, exist_ok=True)
@@ -140,6 +143,15 @@ def main():
                 pq[f"ndcg_{tag}_{R}"] = nd.astype(np.float32)
                 pq[f"mrr_{tag}_{R}"] = mr.astype(np.float32)
                 pq[f"gold_{tag}_{R}"] = gd.astype(np.float32)
+            # The ceiling the reranker is handed: qrels recall of the WHOLE
+            # depth-R list rather than of its first ten. Reranking permutes those
+            # R documents, so it is the same before and after. Without it a low
+            # gold10_post cannot be attributed -- gold@R minus gold10_post is what
+            # the reranker failed to promote, 1 minus gold@R is what the search
+            # never returned, and the two call for opposite fixes.
+            gR = qrels_recall_at_k(cand, rh, R)
+            row["goldR"] = float(gR.mean())
+            pq[f"goldR_{R}"] = gR.astype(np.float32)
             rows.append(row)
             print(f"  [{arm}] R={R:<4} ef={ef:<4} search {ms_s:6.2f} + rerank "
                   f"{ms_rr:7.1f} ms · nDCG {row['ndcg10_pre']:.4f} -> "
@@ -149,7 +161,15 @@ def main():
         np.savez_compressed(RES / f"rerank_pq_{a.corpus}__{arm}.npz", **pq)
         ip.unlink(missing_ok=True)
 
+    # MERGE rather than overwrite. The cross-encoder pass is per arm and the
+    # arms do not fit on disk at once, so they are run one at a time; writing the
+    # file fresh each run would leave only the last arm in it.
     p = RES / f"rerank_pipeline_all_{a.corpus}.json"
+    if p.exists():
+        prev = json.loads(p.read_text())
+        merged = dict(prev.get("arms", {}))
+        merged.update(out["arms"])
+        out["arms"] = merged
     p.write_text(json.dumps(out, indent=2))
     print(f"wrote {p.name}", flush=True)
 

@@ -135,8 +135,23 @@ dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
 # paper's Table 4 and Table 8 had no producing script, so their numbers could be
 # read but not recomputed. Both are entry points rather than imports, which is
 # why the count moves and the closure does not shrink.
-[ "$dead" -le 43 ] && ok "$dead modules, the import closure of what the paper runs" \
-  || bad "$dead modules shipped; the closure is 43"
+[ "$dead" -le 45 ] && ok "$dead modules, the import closure of what the paper runs" \
+  || bad "$dead modules shipped; the closure is 45"
+
+echo "7b. every figure can be rebuilt from the shipped data, without matplotlib"
+if command -v gnuplot > /dev/null 2>&1; then
+  if out=$(cd "$LAB/gnuplot" && make -s check 2>&1 | grep -v "missing or undefined"); then
+    ok "$(tail -1 <<<"$out")"
+  else
+    bad "gnuplot rebuild failed"; echo "$out" | tail -4
+  fi
+else
+  n=$(ls "$LAB"/gnuplot/*.gp 2>/dev/null | wc -l)
+  t=$(ls "$LAB"/gnuplot/*.tsv 2>/dev/null | wc -l)
+  [ "$n" -ge 40 ] && [ "$t" -ge 40 ] \
+    && ok "$t data file(s) and $n script(s) present (gnuplot not installed, not run)" \
+    || bad "the gnuplot bundle is incomplete: $t data, $n scripts"
+fi
 
 echo "8. no path from the machine this was built on, and nothing that names a person"
 # The second half matters more than the first. A leftover /root/SYN only breaks

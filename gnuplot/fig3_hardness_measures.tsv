@@ -1,0 +1,29 @@
+# absolute Spearman correlation of each per-query hardness measure with the quantity named by the block
+# corpora, in column order: glove, msmarco, youtube1m
+# block	measure	glove	msmarco	youtube1m
+
+# (a) |rho| with recall@100 at ef=128
+a	phi1	0.984	0.950	0.935
+a	Steiner	0.970	0.931	0.904
+a	LID	0.878	0.651	0.604
+a	d2k/dk	0.939	0.835	0.833
+a	RC@k	0.870	0.829	0.665
+
+
+
+# (b) |rho| with least NDC to 0.98
+b	phi1	0.937	0.909	0.885
+b	Steiner	0.987	0.980	0.973
+b	LID	0.813	0.602	0.582
+b	d2k/dk	0.902	0.814	0.809
+b	RC@k	0.911	0.865	0.646
+
+
+
+# (c) partial |rho|, fixed budget
+c	phi_1|L	0.931	0.911	0.896
+c	LID|phi_	0.104	0.041	0.007
+c	phi_1|M	0.759	0.621	0.626
+c	ME|phi_1	0.448	0.410	0.347
+
+

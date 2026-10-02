@@ -1,0 +1,14 @@
+# 'what type of dog mix is a morkie'  qid=1015641  arm=vanilla  easy · outside the hard decile
+# mutual rank: min(rank_i(j), rank_j(i)) over the whole corpus; row and column 0 are the query, whose entries are 1..10 by construction
+# row 0 and column 0 are the query; nan on the diagonal is a document against itself
+nan	1	2	3	4	5	6	7	8	9	10
+1	nan	3	1	2	4	1	4	8	3	5
+2	3	nan	2	5	1	8	7	5	1	1
+3	1	2	nan	1	5	2	5	3	5	2
+4	2	5	1	nan	3	6	3	6	4	4
+5	4	1	5	3	nan	17	1	4	2	3
+6	1	8	2	6	17	nan	35	20	33	21
+7	4	7	5	3	1	35	nan	1	15	10
+8	8	5	3	6	4	20	1	nan	17	45
+9	3	1	5	4	2	33	15	17	nan	11
+10	5	1	2	4	3	21	10	45	11	nan

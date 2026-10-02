@@ -67,6 +67,23 @@ REGISTRY: dict[str, EncoderSpec] = {
     "modernbert-embed-large": EncoderSpec(
         "lightonai/modernbert-embed-large", 1024, "mean",
         query_prefix="search_query: ", doc_prefix="search_document: "),
+    # Runs only under transformers 4.x: the bundled modelling code imports
+    # transformers.onnx and find_pruneable_heads_and_indices, both gone in 5.x,
+    # and its __init__ reads 4.x-era config defaults that 5.x stopped setting.
+    # Shimming those three got as far as a meta-device collision inside 5.x's
+    # own loading path, so this rung is encoded under a pinned 4.53.2 venv
+    # rather than patched into the current one. No task adapters and no
+    # prefixes: plain mean pooling is this checkpoint's published usage, unlike
+    # jina-embeddings-v3, whose LoRA adapters are inert without adapter_mask
+    # (and which is CC-BY-NC-4.0, where this one is Apache-2.0).
+    # `revision` pins the weights only. The modelling code lives in a separate
+    # repo, jinaai/jina-bert-implementation, which from_pretrained resolves at
+    # its own main unless code_revision is passed; it was f3ec4cf when this ran.
+    "jina-embeddings-v2-base-en": EncoderSpec(
+        "jinaai/jina-embeddings-v2-base-en", 768, "mean",
+        revision="322d4d7e2f35e84137961a65af894fda0385eb7a",
+        trust_remote_code=True,
+        notes="Native 8192 ctx via ALiBi, capped at the ladder's 512."),
     "qwen3-embedding-0.6b": EncoderSpec(
         "Qwen/Qwen3-Embedding-0.6B", 1024, "last",
         query_prefix="Instruct: Given a web search query, retrieve relevant passages "

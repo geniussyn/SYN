@@ -58,3 +58,43 @@ def perquery_path(corpus, arm, M=16, efc=200, results=None):
         if q.exists():
             return q
     return res / f"perquery_{corpus}__{arm}__M{M}__own_efc{efc}.npz"
+
+
+def cell_or_strata(corpus, arm, M=16, efc=200, results=None):
+    """A cell-shaped dict for an arm that was never measured by run_cell.py.
+
+    The headline arms have `cell_*.json`. An arm added later for comparison may
+    only have `strata_cell.py`'s output, which times the SAME ef grid on every
+    stratum and so already carries the two columns a cell has -- the whole set
+    and the decile -- under different names (`strata.all` / `strata.P90`, with
+    `ms` rather than `ms_per_query`). Synthesising the cell from it is reading
+    the same measurement, not a weaker substitute; requiring a cell instead would
+    mean timing the identical grid a second time.
+
+    Probe rows are dropped: the target search adds points at an ef it already
+    measured, and a duplicate ef would shadow the grid row.
+    """
+    import json
+    res = Path(results) if results else RESULTS
+    p = cell_path(corpus, arm, M, efc, results=res)
+    if p.exists():
+        return json.loads(p.read_text())
+    sp = res / f"strata_{corpus}__{arm}__M{M}__strata_efc{efc}.json"
+    if not sp.exists():
+        raise FileNotFoundError(
+            f"no cell and no strata file for {corpus}/{arm} "
+            f"(looked for {p.name} and {sp.name})")
+    s = json.loads(sp.read_text())
+    st = s.get("strata") or {}
+    allg = {r["ef"]: r for r in st.get("all", {}).get("grid", [])
+            if "probe_for" not in r}
+    hard = {r["ef"]: r for r in st.get("P90", {}).get("grid", [])
+            if "probe_for" not in r}
+    grid = []
+    for ef in sorted(allg):
+        row = {"ef": ef, "ms_per_query": allg[ef]["ms"]}
+        if ef in hard:
+            row["ms_per_query_hard"] = hard[ef]["ms"]
+        grid.append(row)
+    return {**{k: v for k, v in s.items() if k != "strata"},
+            "grid": grid, "synthesised_from": sp.name}

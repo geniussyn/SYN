@@ -89,7 +89,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 LAB="${LAB:-/root/SYN}"
 TRAIN="${TRAIN:-/root/SYN-train}"
 
-rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests}
+rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests,gnuplot}
 rm -rf "$HERE"/lab "$HERE"/syn      # the layout before the rename, if a clone has it
 mkdir -p "$HERE"/{analysis,native/third_party,scripts,results,figures,corpora} \
          "$HERE"/studies/{tail-censoring/out,annotation,hardness/scripts} \
@@ -169,6 +169,7 @@ MODULES="audit_timing build_mmarco encode_cache
          goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
          ivf_table sweep_table families_table encoders_table
+         gnuplot_all export_gnuplot
          paths rerank_pipeline rerank_strata run_cell run_family
          run_ngfix screen_arm strata_cell style
          annot_agree build_stability config_table
@@ -303,6 +304,19 @@ for f in fig_tail_censor fig_mutual_rank fig_hardness_measures \
   done
 done
 
+# ------------------------------------------------------------------ gnuplot --
+# The same numbers as TSV, with a gnuplot script per figure and a Makefile.
+# The matplotlib scripts in analysis/ stay the source of record -- they draw the
+# paper's panels -- but a reader who wants the numbers should not have to run a
+# plotting stack to see them, and a reader who wants to redraw should not have
+# to parse the result JSON. `make -C gnuplot check` rebuilds all of them.
+if [ -d "$LAB/export/gnuplot" ]; then
+  mkdir -p "$HERE/gnuplot"
+  cp "$LAB"/export/gnuplot/*.tsv "$LAB"/export/gnuplot/*.gp \
+     "$LAB"/export/gnuplot/*.txt "$LAB"/export/gnuplot/Makefile \
+     "$HERE/gnuplot/" 2>/dev/null || true
+fi
+
 # --------------------------------------------------------------------- done --
 # docs/, tools/, README.md, LICENSE and the two shell scripts are the
 # repository's own and are versioned, not assembled; collect.sh does not touch
@@ -326,5 +340,6 @@ printf '  %-14s %s\n' \
   "results"     "$(ls "$HERE"/results  | wc -l) files" \
   "figures"     "$(ls "$HERE"/figures  | wc -l) files" \
   "scripts"     "$(ls "$HERE"/scripts  | wc -l) lanes" \
+  "gnuplot"     "$(ls "$HERE"/gnuplot/*.tsv 2>/dev/null | wc -l) data + $(ls "$HERE"/gnuplot/*.gp 2>/dev/null | wc -l) scripts" \
   "src + tests" "$(ls "$HERE"/src/syn "$HERE"/tests | grep -c '\.py$') files"
 printf '  %-14s %s\n' "total" "$(du -sh --exclude=.git "$HERE" | cut -f1)"

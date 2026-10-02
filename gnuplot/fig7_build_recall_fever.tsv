@@ -1,0 +1,36 @@
+# FEVER 1M: hard-decile recall@10 reachable within a time budget,
+# against the HNSW degree M at efC=200
+# blocks, in index order:
+#   0  Vanilla / budget 1 ms
+#   1  SYN / budget 1 ms
+#   2  Vanilla / budget 5 ms
+#   3  SYN / budget 5 ms
+# x	y
+
+# Vanilla / budget 1 ms
+8	0.557721
+16	0.608696
+32	0.701499
+
+
+
+# SYN / budget 1 ms
+8	0.870015
+16	0.897451
+32	0.934633
+
+
+
+# Vanilla / budget 5 ms
+8	0.823088
+16	0.891454
+32	0.937031
+
+
+
+# SYN / budget 5 ms
+8	0.970465
+16	0.987556
+32	0.994003
+
+

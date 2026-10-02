@@ -1,0 +1,36 @@
+# MS MARCO 1M: hard-decile recall@10 reachable within a time budget,
+# against the HNSW degree M at efC=200
+# blocks, in index order:
+#   0  Vanilla / budget 1 ms
+#   1  SYN / budget 1 ms
+#   2  Vanilla / budget 5 ms
+#   3  SYN / budget 5 ms
+# x	y
+
+# Vanilla / budget 1 ms
+8	0.653438
+16	0.739685
+32	0.763897
+
+
+
+# SYN / budget 1 ms
+8	0.956734
+16	0.973066
+32	0.975788
+
+
+
+# Vanilla / budget 5 ms
+8	0.87063
+16	0.932235
+32	0.94957
+
+
+
+# SYN / budget 5 ms
+8	0.990401
+16	0.996562
+32	0.997994
+
+

@@ -28,3 +28,6 @@ adapters/
 .DS_Store
 __MACOSX/
 *.swp
+
+# gnuplot renders its own output; the data and the scripts are versioned
+gnuplot/*.pdf

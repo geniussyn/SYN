@@ -1,0 +1,18 @@
+{
+  "corpus": "fever",
+  "arm": "gf-center",
+  "M": 16,
+  "maxM0": 32,
+  "k": 10,
+  "n_queries": 1000,
+  "query_seed": 777,
+  "asymmetric": false,
+  "phi1_hat": 3.689,
+  "pr_phi1_hat_eq_1": 0.212,
+  "median_mutual_rank": 320.0,
+  "pair_within_maxM0": 0.28884444444444446,
+  "exhaustive_mrr10": 0.8937357142857143,
+  "exhaustive_ndcg10": 0.8855971372867362,
+  "exhaustive_gold10": 0.9473380952380953,
+  "note": "phi1_hat as in screen_arm.py. For an asymmetric correction the document-to-document ranks are read in key/val form, which is the correction's own definition and more favourable than any index can realise."
+}
