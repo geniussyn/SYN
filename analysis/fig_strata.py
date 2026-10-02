@@ -46,7 +46,14 @@ OUT = ROOT / "figures"
 # this survives an order of magnitude more documents. The scale point takes the
 # slot: the same adapter, trained on 500 queries against the 1M subset, applied
 # unchanged to the full 8.8M collection that contains it.
-COLLS = [("msmarco-1m", "MS MARCO"), ("fever", "FEVER"), ("nq", "NQ"),
+# MS COCO takes NQ's slot. It is the collection on which SYN does not help --
+# 0.97x on the hard decile, slightly slower -- and a main figure that shows only
+# gains is not reporting the result, it is advertising it. Its overlap is 0.467,
+# between NQ's 0.371 and Quora's 0.674, so it falls on the side of the boundary
+# Section 5.1 draws rather than contradicting it: the panel is a negative case
+# the overlap statistic predicts, which is a stronger claim than a sixth win.
+# NQ stays in the family, NGFix and rerank figures and in the overlap list.
+COLLS = [("msmarco-1m", "MS MARCO"), ("fever", "FEVER"), ("mscoco", "MS COCO"),
          ("quora", "Quora"),
          ("msmarco-fr", "mMARCO French"),
          # one scale point: the same collection at its full size, same adapter

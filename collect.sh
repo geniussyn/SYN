@@ -43,8 +43,10 @@
 #                      has no room for it. In the lab as code/anchor_locality.py
 #                      and results/anchor_locality_*.json, ready if a reviewer
 #                      asks how 500 queries move a million documents.
-#   MS COCO            measured as a fifth collection, not in the paper.
-#                      lab/results/excluded/, with the reason.
+#   (MS COCO was here until 2026-10-02. It is in Figure 5 now, in NQ's slot:
+#    it is the collection on which SYN does not help, 0.97x on the hard
+#    decile, and its overlap of 0.467 puts it on the side of the boundary
+#    Section 5.1 draws. A main figure of six wins is not a result.)
 #   de ru zh ja hi id  cross-lingual screening; only ar and fr are measured
 #                      end to end and only those two are claimed.
 #   63 scripts         earlier campaigns, superseded figures, annotation tools.
@@ -221,7 +223,7 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
   for f in "$LAB"/results/$g; do
     [ -e "$f" ] || continue
     case "$(basename "$f")" in
-      *mscoco*|*_hard20_*) continue ;;
+      *_hard20_*) continue ;;
       # Section 5's encoder comparison is MS MARCO only, for space. All five
       # encoders were measured on FEVER too and the ordering is the same, but
       # the figure does not read those runs, so they do not ship. The reference

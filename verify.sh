@@ -127,7 +127,7 @@ fi
 echo "7. nothing shipped that the paper does not use"
 stray=$( { ls "$LAB"/results "$LAB"/corpora "$FIGS" "$CODE" \
            "$HERE"/patches 2>/dev/null; } \
-         | grep -cE "mscoco|msmarco-(de|ru|zh|ja|hi|id)|darth" || true)
+         | grep -cE "msmarco-(de|ru|zh|ja|hi|id)|darth" || true)
 [ "$stray" -eq 0 ] && ok "no dropped collection leaked into results, corpora or figs" \
   || bad "$stray file(s) the paper does not use"
 dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)

@@ -55,19 +55,19 @@ plot \
   "fig5_strata_fever.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
   "fig5_strata_fever.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
-set title "NQ 1M" font ",8" offset 0,-0.4
+set title "MS COCO 588K" font ",8" offset 0,-0.4
 unset xlabel
 unset ylabel
 set key off
 plot \
-  "fig5_strata_nq.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
-  "fig5_strata_nq.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
-  "fig5_strata_nq.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
+  "fig5_strata_mscoco.tsv" index 0 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_mscoco.tsv" index 1 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_mscoco.tsv" index 2 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_mscoco.tsv" index 3 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#EA3323" notitle, \
+  "fig5_strata_mscoco.tsv" index 4 using 1:2 with linespoints lw 1.4 dt 1 pt 7 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_mscoco.tsv" index 5 using 1:2 with linespoints lw 1.4 dt 2 pt 5 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_mscoco.tsv" index 6 using 1:2 with linespoints lw 1.4 dt 3 pt 9 ps 0.32 pi 2 lc rgb "#0000F5" notitle, \
+  "fig5_strata_mscoco.tsv" index 7 using 1:2 with linespoints lw 1.4 dt 4 pt 3 ps 0.32 pi 2 lc rgb "#0000F5" notitle
 
 set title "Quora 523K" font ",8" offset 0,-0.4
 set xlabel "search time per query (ms)"
