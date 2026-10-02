@@ -57,6 +57,21 @@ def write_style(path, rows):
 
 
 
+HOUSE = """
+# --- house style: seaborn darkgrid, as the matplotlib figures use -----------
+set style line 101 lc rgb "#FFFFFF" lw 1.1 dt 1
+set grid back ls 101
+set border 0
+set tics nomirror scale 0 textcolor rgb "#262626"
+set xlabel textcolor rgb "#262626"
+set ylabel textcolor rgb "#262626"
+set title textcolor rgb "#262626"
+set key textcolor rgb "#262626"
+set object 1 rectangle from graph 0,0 to graph 1,1 behind \\
+    fillcolor rgb "#EAEAF2" fillstyle solid 1.0 noborder
+"""
+
+
 def mod(name):
     return importlib.import_module(name)
 

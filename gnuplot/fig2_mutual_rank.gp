@@ -4,6 +4,18 @@
 # The diagonal is NaN -- a document against itself -- and is left blank.
 set terminal pdfcairo size 7.6in,2.7in font "Helvetica,10" noenhanced
 set output "fig2_mutual_rank.pdf"
+
+# --- house style: seaborn darkgrid, as the matplotlib figures use -----------
+set style line 101 lc rgb "#FFFFFF" lw 1.1 dt 1
+set grid back ls 101
+set border 0
+set tics nomirror scale 0 textcolor rgb "#262626"
+set xlabel textcolor rgb "#262626"
+set ylabel textcolor rgb "#262626"
+set title textcolor rgb "#262626"
+set key textcolor rgb "#262626"
+set object 1 rectangle from graph 0,0 to graph 1,1 behind \
+    fillcolor rgb "#EAEAF2" fillstyle solid 1.0 noborder
 array TITLE[3] = ["Vanilla, easy query", "Vanilla, fragmented", "SYN, the same query"]
 set logscale cb
 set cbrange [1:40000]

@@ -81,9 +81,24 @@ def cell_or_strata(corpus, arm, M=16, efc=200, results=None):
         return json.loads(p.read_text())
     sp = res / f"strata_{corpus}__{arm}__M{M}__strata_efc{efc}.json"
     if not sp.exists():
-        raise FileNotFoundError(
-            f"no cell and no strata file for {corpus}/{arm} "
-            f"(looked for {p.name} and {sp.name})")
+        # Third source: run_family's own grid. It carries the same two timing
+        # columns under the same names -- ms_per_query and ms_per_query_hard,
+        # the latter only when it ran with --time-hard -- keyed by `param`
+        # rather than `ef`. An arm measured for the two-population figure needs
+        # no strata pass, and demanding one would time the same grid again for
+        # percentiles the figure does not draw.
+        fp = res / f"family_hnswlib_{corpus}__{arm}__own.json"
+        if not fp.exists():
+            raise FileNotFoundError(
+                f"no cell, strata or family file for {corpus}/{arm} "
+                f"(looked for {p.name}, {sp.name} and {fp.name})")
+        f = json.loads(fp.read_text())
+        grid = [{"ef": r["param"],
+                 **{k: r[k] for k in ("ms_per_query", "ms_per_query_hard")
+                    if k in r}}
+                for r in f["grid"]]
+        return {**{k: v for k, v in f.items() if k != "grid"},
+                "grid": grid, "synthesised_from": fp.name}
     s = json.loads(sp.read_text())
     st = s.get("strata") or {}
     allg = {r["ef"]: r for r in st.get("all", {}).get("grid", [])
