@@ -18,6 +18,8 @@
 #                      out of here: the runs, the two patches against it, the
 #                      four scripts that drive it and its figure panels. All of
 #                      it is in the lab.
+#   (fig_dist was here until 2026-10-02; it is in the paper now, as the
+#    distribution behind the means that Section 5.3 quotes.)
 #   fig_crosslingual   the two mMARCO query sets on their own axes. Superseded:
 #                      fig_strata carries them as two of its panels, so the
 #                      paper shows them once. In the lab as
@@ -164,7 +166,7 @@ fi
 # ------------------------------------------------------------- measurement ---
 # the entry points the paper needs, plus everything they import
 MODULES="audit_timing build_mmarco encode_cache
-         fig_build_cost fig_families fig_ivf_spread fig_mutual_rank
+         fig_build_cost fig_dist fig_families fig_ivf_spread fig_mutual_rank
          fig_ngfix fig_rerank_strata fig_strata fig_sweep
          goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
@@ -297,7 +299,7 @@ cp "$LAB"/tailcensor/out/*.json "$LAB"/tailcensor/out/*.npz \
 # fig4_mechanism is a schematic and has no script in the lab; it is not here.
 for f in fig_tail_censor fig_mutual_rank fig_hardness_measures \
          fig_strata_M16 fig_families fig_build_cost \
-         fig_rerank_strata fig_encoders \
+         fig_rerank_strata fig_encoders fig_dist \
          figA_ngfix_all figA_rerank_all; do
   for e in pdf png; do
     [ -f "$LAB/figs/final/$f.$e" ] && cp "$LAB/figs/final/$f.$e" "$HERE/figures/"

@@ -68,6 +68,12 @@ def setup(size=13):
         "mathtext.rm": "Linux Libertine O",
         "mathtext.it": "Linux Libertine O:italic",
         "mathtext.bf": "Linux Libertine O:bold",
+        # a custom fontset leaves cal/sf/tt at matplotlib's defaults, and the
+        # default for cal is a cursive family nobody here has, so every figure
+        # with maths printed a findfont warning and silently substituted
+        "mathtext.cal": "Linux Libertine O:italic",
+        "mathtext.sf": "Linux Libertine O",
+        "mathtext.tt": "Linux Libertine Mono O",
         "font.size": size,
         "axes.titlesize": size + 2, "axes.labelsize": size,
         "xtick.labelsize": size - 1, "ytick.labelsize": size - 1,

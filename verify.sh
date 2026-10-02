@@ -84,7 +84,7 @@ fi
 
 echo "6. every shipped figure has the script that drew it, and vice versa"
 for f in fig_families fig_mutual_rank fig_strata \
-         fig_build_cost fig_rerank_strata; do
+         fig_build_cost fig_rerank_strata fig_dist; do
   # fig_strata writes fig_strata_M16
   [ -f "$CODE/$f.py" ] || { bad "$(basename "$CODE")/$f.py missing"; continue; }
   hit=$(ls "$FIGS"/"$f"*.pdf 2>/dev/null | head -1)
@@ -96,8 +96,8 @@ extra=$(ls "$FIGS"/*.pdf 2>/dev/null | wc -l)
 # are eight here. The loop above checks the five whose script name matches their
 # output; encoders, hardness measures and tail censor are checked by 6b and 6d,
 # and the appendix pair is drawn by fig_ngfix.py and fig_rerank_strata.py.
-[ "$extra" -eq 10 ] && ok "8 main figures and 2 appendix, no strays" \
-  || bad "$extra figures shipped, expected 10"
+[ "$extra" -eq 11 ] && ok "9 main figures and 2 appendix, no strays" \
+  || bad "$extra figures shipped, expected 11"
 
 echo "6b. the tail-censoring measurement ships with its scripts"
 if [ -f "$FIGS/fig_tail_censor.pdf" ]; then
@@ -135,8 +135,8 @@ dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
 # paper's Table 4 and Table 8 had no producing script, so their numbers could be
 # read but not recomputed. Both are entry points rather than imports, which is
 # why the count moves and the closure does not shrink.
-[ "$dead" -le 45 ] && ok "$dead modules, the import closure of what the paper runs" \
-  || bad "$dead modules shipped; the closure is 45"
+[ "$dead" -le 46 ] && ok "$dead modules, the import closure of what the paper runs" \
+  || bad "$dead modules shipped; the closure is 46"
 
 echo "7b. every figure can be rebuilt from the shipped data, without matplotlib"
 if command -v gnuplot > /dev/null 2>&1; then
