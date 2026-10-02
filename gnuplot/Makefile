@@ -8,10 +8,15 @@
 # the paper's typography -- the paper's panels come from the matplotlib scripts
 # in analysis/, which read the same results and are the source of record.
 
+# paper_*.gp assemble the per-panel sheets into the figures the paper prints;
+# the rest are the single panels those are built from.
 GP  := $(wildcard *.gp)
+PAPER := $(wildcard paper_*.gp)
 PDF := $(GP:.gp=.pdf)
 
 all: $(PDF)
+
+paper: $(PAPER:.gp=.pdf)
 
 %.pdf: %.gp
 	gnuplot $<
@@ -26,4 +31,4 @@ check: all
 clean:
 	rm -f $(PDF)
 
-.PHONY: all check clean
+.PHONY: all paper check clean

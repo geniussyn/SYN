@@ -39,6 +39,12 @@ RED = "#EA3323"
 GREEN = "#2E7D32"
 ORANGE = "#D97706"
 INK = "#262626"
+# Added for the baseline comparison, which needs a fifth accent: the figure
+# groups interventions by WHAT they repair, and a reader has to tell four groups
+# apart at print size. Purple is the graph-side group (NGFix, RoarGraph); it is
+# the one hue left that holds against the other four in greyscale, sitting
+# between BLUE and RED in luminance rather than beside either.
+PURPLE = "#7B2CBF"
 
 PALETTE = [BLUE, RED, GREEN, ORANGE, INK]
 
