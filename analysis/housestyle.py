@@ -56,9 +56,18 @@ def setup(size=13):
         # ACM camera-ready rejects Type 3 fonts; 42 embeds TrueType instead.
         "pdf.fonttype": 42, "ps.fonttype": 42,
         "figure.dpi": 130, "savefig.dpi": 200, "savefig.bbox": "tight",
-        "font.family": "DejaVu Sans",
-        "font.sans-serif": ["DejaVu Sans"],
-        "mathtext.fontset": "dejavusans",
+        # acmart sets the body in Linux Libertine, so the figures are set in
+        # it too: a panel in a different face reads as imported artwork. Falls
+        # back to DejaVu where Libertine is not installed, which keeps a figure
+        # renderable on a machine that has not got the font rather than
+        # silently substituting something arbitrary.
+        "font.family": "serif",
+        "font.serif": ["Linux Libertine O", "Libertinus Serif",
+                       "DejaVu Serif"],
+        "mathtext.fontset": "custom",
+        "mathtext.rm": "Linux Libertine O",
+        "mathtext.it": "Linux Libertine O:italic",
+        "mathtext.bf": "Linux Libertine O:bold",
         "font.size": size,
         "axes.titlesize": size + 2, "axes.labelsize": size,
         "xtick.labelsize": size - 1, "ytick.labelsize": size - 1,
