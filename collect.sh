@@ -224,6 +224,14 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
     [ -e "$f" ] || continue
     case "$(basename "$f")" in
       *_hard20_*) continue ;;
+      # run_ngfix.py --timed writes a second file beside the one the figure
+      # reads. No shipped figure or table reads it -- fig_ngfix.py opens
+      # ngfix_<corpus>__<arm>.json -- and ngfix_quora__syn_timed.json carries
+      # fifteen timing inversions, one of them -91%, which is what a
+      # measurement taken while another lane was running looks like. Shipping
+      # an unread file is a small fault; shipping a contended timing as though
+      # it were evidence is not.
+      ngfix_*_timed.json) continue ;;
       # Section 5's encoder comparison is MS MARCO only, for space. All five
       # encoders were measured on FEVER too and the ordering is the same, but
       # the figure does not read those runs, so they do not ship. The reference
