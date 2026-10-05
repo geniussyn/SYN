@@ -153,6 +153,15 @@ else
     || bad "the gnuplot bundle is incomplete: $t data, $n scripts"
 fi
 
+echo "7c. the training's product ships, and can regenerate the embeddings"
+na=$(ls -d "$LAB"/adapters/*/ 2>/dev/null | wc -l)
+nw=$(ls "$LAB"/adapters/*/adapter_model.safetensors 2>/dev/null | wc -l)
+if [ "$na" -ge 7 ] && [ "$nw" -eq "$na" ]; then
+  ok "$na adapter(s), each with weights ($(du -sh "$LAB/adapters" | cut -f1))"
+else
+  bad "$na adapter dir(s) but $nw weight file(s)"
+fi
+
 echo "8. no path from the machine this was built on, and nothing that names a person"
 # The second half matters more than the first. A leftover /root/SYN only breaks
 # on someone else's disk; a home directory in a path names an author, and this

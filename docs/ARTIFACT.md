@@ -9,6 +9,7 @@ Three parts, kept separate because they are built and run at different times:
 | | what it is | what ships |
 |---|---|---|
 | `src/syn/`, `tests/` | training: mining, the boundary pull, the query-radial objective | source |
+| `adapters/` | what that training produced: seven LoRAs, 91 MB | weights |
 | `analysis/`, `results/`, `figures/` | measurement: index builds, timed search, every figure | source and results |
 | `patches/` | the changes made to two baselines | diffs only |
 
@@ -21,6 +22,8 @@ results/*.json             every measurement: the parameter that was executed,
                            the recall it returned, the milliseconds it cost
 figures/                   the paper's figures, as PDF and PNG
 analysis/, src/syn/        the scripts that produced both
+adapters/                  the seven LoRA adapters the paper measures, which
+                           regenerate any embedding in it
 scripts/                   the lanes that ran them, in the order they ran
 native/                    the timing harnesses, with hnswlib vendored beside
 corpora/*_manifest.json    the seed and BEIR snapshot each collection was cut
@@ -34,7 +37,8 @@ The inputs do not, because they are large and follow from the above:
 
 ```
 corpora/      1.4 GB    rebuilt by `python -m syn.corpus`
-emb/           25 GB    rebuilt by `analysis/encode_cache.py`
+emb/           25 GB    rebuilt by `analysis/encode_cache.py` from the
+                        adapters that do ship, 7.4 min per million documents
 graph_*.npz   1.2 GB    dumped level-0 adjacency. Its only product is phi,
                         which is in the cell JSON already, and it cannot be
                         reproduced bit for bit anyway

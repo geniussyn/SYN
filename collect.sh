@@ -93,7 +93,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 LAB="${LAB:-/root/SYN}"
 TRAIN="${TRAIN:-/root/SYN-train}"
 
-rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests,gnuplot}
+rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests,gnuplot,adapters}
 rm -rf "$HERE"/lab "$HERE"/syn      # the layout before the rename, if a clone has it
 mkdir -p "$HERE"/{analysis,native/third_party,scripts,results,figures,corpora} \
          "$HERE"/studies/{tail-censoring/out,annotation,hardness/scripts} \
@@ -308,6 +308,38 @@ for f in fig_tail_censor fig_mutual_rank fig_hardness_measures \
   done
 done
 
+# ----------------------------------------------------------------- adapters --
+# What the training produces, and the only thing a reader needs in order to
+# reproduce any embedding in the paper. BGE-M3 is public, the corpora are
+# public, and each arm's manifest pins encoder_hf_id and encoder_revision, so
+# an adapter plus encode_cache.py regenerates the vectors bit for bit --
+# 7.4 minutes per million documents on one GPU.
+#
+# This matters more than the embeddings themselves. A 1.9 GB .npy shows what
+# came out; a 9.5 MB adapter shows that this pipeline is what produced it,
+# which is the claim a reviewer is actually checking.
+#
+# Seven, which is every adapter the paper's figures and tables read:
+#   msmarco-1m/adapter_syn        the main arm, all of Section 5 but 5.9/5.10
+#   msmarco-1m/adapter_syn-plain  the ablation table's "plain gradient" row
+#   ablation/nopull               the ablation table's "no pull" row
+#   enc-{mini,e5l,gte,qw4}        the encoder ladder; BGE-M3 reuses the main one
+# The hyperparameter sweep's fourteen adapters do not ship: that figure is not
+# in the paper either.
+mkdir -p "$HERE/adapters"
+for a in "msmarco-1m/adapter_syn:syn" \
+         "msmarco-1m/adapter_syn-plain:syn-plain" \
+         "ablation/nopull/adapter_nopull:nopull" \
+         "enc-mini/adapter_syn:encoder-minilm-l6" \
+         "enc-e5l/adapter_syn:encoder-e5-large" \
+         "enc-gte/adapter_syn:encoder-gte-large" \
+         "enc-qw4/adapter_syn:encoder-qwen3-4b"; do
+  src="$TRAIN/adapters/${a%%:*}"; dst="$HERE/adapters/${a##*:}"
+  [ -d "$src" ] || { echo "  !! adapter ${a%%:*} missing"; continue; }
+  mkdir -p "$dst"
+  cp "$src"/adapter_config.json "$src"/adapter_model.safetensors "$dst"/ 2>/dev/null
+done
+
 # ------------------------------------------------------------------ gnuplot --
 # The same numbers as TSV, with a gnuplot script per figure and a Makefile.
 # The matplotlib scripts in analysis/ stay the source of record -- they draw the
@@ -349,5 +381,6 @@ printf '  %-14s %s\n' \
   "figures"     "$(ls "$HERE"/figures  | wc -l) files" \
   "scripts"     "$(ls "$HERE"/scripts  | wc -l) lanes" \
   "gnuplot"     "$(ls "$HERE"/gnuplot/*.tsv 2>/dev/null | wc -l) data + $(ls "$HERE"/gnuplot/*.gp 2>/dev/null | wc -l) scripts" \
+  "adapters"    "$(ls -d "$HERE"/adapters/*/ 2>/dev/null | wc -l) LoRA, $(du -sh --exclude=.git "$HERE"/adapters 2>/dev/null | cut -f1)" \
   "src + tests" "$(ls "$HERE"/src/syn "$HERE"/tests | grep -c '\.py$') files"
 printf '  %-14s %s\n' "total" "$(du -sh --exclude=.git "$HERE" | cut -f1)"

@@ -18,9 +18,11 @@ figures/**/DONE_*
 *.pyc
 .ipynb_checkpoints/
 
-# adapters and mined tensors live in the training tree, not here
-adapters/
+# The mined tensors live in the training tree. The adapters do not: they are
+# the training's product and the only thing needed to regenerate any embedding
+# in the paper, 89 MB for all seven.
 *.safetensors
+!adapters/**/*.safetensors
 *.bin
 !native/**
 

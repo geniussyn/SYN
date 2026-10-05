@@ -1,0 +1,17 @@
+{
+  "corpus": "quora",
+  "arm": "gf-flow",
+  "M": 16,
+  "maxM0": 32,
+  "k": 10,
+  "n_queries": 1000,
+  "query_seed": 777,
+  "phi1_hat": 1.162,
+  "pr_phi1_hat_eq_1": 0.887,
+  "median_mutual_rank": 8.0,
+  "pair_within_maxM0": 0.7511555555555556,
+  "exhaustive_mrr10": 0.8526456349206348,
+  "exhaustive_ndcg10": 0.8571160072185336,
+  "exhaustive_gold10": 0.934979872594199,
+  "note": "phi1_hat: components of the target set under the best graph a builder with out-degree maxM0 could make. No index, no build noise; a bound on the real phi_1."
+}
