@@ -1,77 +1,103 @@
-"""The build-parameter sweep, as a table.
+"""Appendix I: the hyperparameter sweep, as a table.
 
-The figure drew six recall-vs-time curves per collection. What the text quotes
-from them is two numbers per setting -- the time to reach recall 0.90 and 0.95
-on the hard decile -- and one fact the curves show but a ratio cannot: at the
-smallest degree the untrained arm does not reach 0.95 at any budget in the grid,
-so there is no ratio to report and the cell says what it reached instead.
+The review's W6 asks for sensitivity to lambda_pull, tau_p, L and the number of
+training queries, and notes that the appendix promising sweeps contains almost
+none. The thirteen points were measured; they were never tabulated, because the
+figure that would have carried them was cut.
 
-Times come from each cell's own hard-decile column, which is the same runner and
-the same grid for every row, so the rows are comparable to each other. They are
-NOT comparable with the strata figure, which times each stratum on its own
-queries; that difference is about a tenth and is why the two are never mixed.
+Every column here is INDEX-FREE. phi-hat_1 is the fragmentation of a query's
+exact top-k under the best graph a builder with out-degree maxM0 = 2M could
+make, so it needs no index and no search; the three quality columns are scored
+on the exact top-10, so they need no index and no reranker either. One sweep
+point is therefore an adapter and a screen, not an adapter and a build, which is
+why thirteen of them exist at all.
+
+That also makes the table do a second job. Because quality and fragmentation are
+measured on the same points by the same procedure, the sweep traces the trade
+the paper is making rather than asserting it: the correlation between phi-hat_1
+and exhaustive MRR across these points says whether lowering fragmentation
+always costs ranking, or only does so past some setting.
 """
-import argparse
 import json
 import sys
 from pathlib import Path
+
+import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paths import ROOT                                           # noqa: E402
 
 RES = ROOT / "results"
-CELLS = [(8, 200), (16, 200), (32, 200), (16, 100), (16, 300)]
-TARGETS = (0.90, 0.95)
+CORPUS = "msmarco-1m"
 
-
-def curve(corpus, arm, M, efc):
-    p = RES / f"cell_{corpus}__{arm}__M{M}__own_efc{efc}.json"
-    if not p.exists():
-        return None
-    g = json.loads(p.read_text())["grid"]
-    return sorted((r["ms_per_query_hard"], r.get("recall_hard"), r["ef"])
-                  for r in g if r.get("recall_hard") is not None)
-
-
-def at(g, r):
-    ok = [x for x in g if x[1] >= r]
-    return min(ok, key=lambda x: x[0]) if ok else None
+# arm suffix, which knob it moves, the value, and the shipped setting for it
+POINTS = [
+    ("vanilla",      "—",                "untrained",   False),
+    ("abl-nopull",   "lambda_pull",      "0 (no pull)", False),
+    ("abl-lam0.3",   "lambda_pull",      "0.3",         False),
+    ("syn",          "lambda_pull",      "1.0 (ship)",  True),
+    ("abl-lam2.0",   "lambda_pull",      "2.0",         False),
+    ("abl-lam3.0",   "lambda_pull",      "3.0",         False),
+    ("abl-tp0.005",  "tau_p",            "0.005",       False),
+    ("abl-tp0.05",   "tau_p",            "0.05",        False),
+    ("abl-tp0.1",    "tau_p",            "0.1",         False),
+    ("abl-L32",      "L",                "32",          False),
+    ("abl-L130",     "L",                "130",         False),
+    ("abl-n50",      "n_train",          "50",          False),
+    ("abl-n100",     "n_train",          "100",         False),
+    ("abl-n250",     "n_train",          "250",         False),
+    ("abl-uniform",  "negative source",  "uniform",     False),
+]
+COLS = [("phi1_hat", "phi1"), ("pr_phi1_hat_eq_1", "P(phi1=1)"),
+        ("median_mutual_rank", "med.mr"), ("pair_within_maxM0", "pair<=2M"),
+        ("exhaustive_mrr10", "MRR@10"), ("exhaustive_ndcg10", "nDCG@10"),
+        ("exhaustive_gold10", "gold@10")]
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--corpora", default="msmarco-1m,fever")
-    a = ap.parse_args()
-    tex = ["% hard decile, each arm against its own exact top-10, times from the",
-           "% cell's own hard-decile column. 'n/r' is not reached at any ef in the",
-           "% grid; the deepest recall the arm did reach is given instead."]
-    for c in a.corpora.split(","):
-        print(f"\n{c}  (hard decile)")
-        print(f"  {'setting':16s}" + "".join(
-            f"{f't@{t:g} V':>10s}{f't@{t:g} S':>10s}{'x':>8s}" for t in TARGETS))
-        tex.append(f"% {c}")
-        for M, efc in CELLS:
-            gv, gs = curve(c, "vanilla", M, efc), curve(c, "syn", M, efc)
-            if not (gv and gs):
-                continue
-            lab = f"M={M}, efC={efc}"
-            line, cells = f"  {lab:16s}", []
-            for t in TARGETS:
-                pv, ps = at(gv, t), at(gs, t)
-                if pv and ps:
-                    line += f"{pv[0]:10.2f}{ps[0]:10.2f}{pv[0]/ps[0]:7.2f}x"
-                    cells += [f"{pv[0]:.2f}", f"{ps[0]:.2f}", f"{pv[0]/ps[0]:.2f}$\\times$"]
-                else:
-                    top = max(x[1] for x in gv)
-                    who = "V" if not pv else "S"
-                    line += f"{'n/r':>10s}{(ps[0] if ps else float('nan')):10.2f}" \
-                            f"{f'({who} {top:.3f})':>8s}"
-                    cells += [f"n/r\\,({top:.3f})",
-                              f"{ps[0]:.2f}" if ps else "n/r", "--"]
-            print(line)
-            tex.append(f"    {lab:16s} & " + " & ".join(cells) + r" \\")
-    (RES / "sweep_table.tex").write_text("\n".join(tex) + "\n")
-    print(f"\nwrote sweep_table.tex")
+    rows = []
+    for arm, knob, val, ship in POINTS:
+        p = RES / f"screen_{CORPUS}__{arm}.json"
+        if not p.exists():
+            print(f"  missing {p.name}", flush=True)
+            continue
+        d = json.loads(p.read_text())
+        rows.append((arm, knob, val, ship, d))
+
+    w = max(len(f"{k} = {v}") for _a, k, v, _s, _d in rows)
+    head = f"{'setting':{w}s}  " + "  ".join(f"{lab:>9s}" for _k, lab in COLS)
+    print(head)
+    print("-" * len(head))
+    last = None
+    for arm, knob, val, ship, d in rows:
+        if knob != last and last is not None:
+            print()
+        last = knob
+        name = f"{knob} = {val}" if knob != "—" else val
+        cells = "  ".join(f"{d.get(k, float('nan')):9.4f}" for k, _l in COLS)
+        print(f"{name:{w}s}  {cells}" + ("   <- shipped" if ship else ""))
+
+    # The trade, over the sweep rather than asserted. Untrained is excluded: it
+    # is not a setting of the method, and leaving it in would let one point at
+    # the end of both axes manufacture the correlation.
+    sw = [d for _a, k, _v, _s, d in rows if k != "—"]
+    phi = np.array([d["phi1_hat"] for d in sw])
+    for key, lab in (("exhaustive_mrr10", "MRR@10"),
+                     ("exhaustive_ndcg10", "nDCG@10"),
+                     ("exhaustive_gold10", "gold@10")):
+        q = np.array([d[key] for d in sw])
+        r = float(np.corrcoef(phi, q)[0, 1])
+        print(f"\ncorr(phi1_hat, {lab}) over {len(sw)} sweep points = {r:+.3f}")
+
+    out = RES / "sweep_table.json"
+    out.write_text(json.dumps(
+        {"corpus": CORPUS, "n_points": len(rows),
+         "note": "index-free: phi-hat_1 needs no index, the quality columns are "
+                 "scored on the exact top-10 with no reranker",
+         "rows": [{"arm": a, "knob": k, "value": v, "shipped": s,
+                   **{c: d.get(c) for c, _l in COLS}}
+                  for a, k, v, s, d in rows]}, indent=2))
+    print(f"\nwrote {out.name}")
 
 
 if __name__ == "__main__":

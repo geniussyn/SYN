@@ -135,8 +135,8 @@ dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
 # paper's Table 4 and Table 8 had no producing script, so their numbers could be
 # read but not recomputed. Both are entry points rather than imports, which is
 # why the count moves and the closure does not shrink.
-[ "$dead" -le 49 ] && ok "$dead modules, the import closure of what the paper runs" \
-  || bad "$dead modules shipped; the closure is 49"
+[ "$dead" -le 50 ] && ok "$dead modules, the import closure of what the paper runs" \
+  || bad "$dead modules shipped; the closure is 50"
 
 echo "7b. every figure can be rebuilt from the shipped data, without matplotlib"
 if command -v gnuplot > /dev/null 2>&1; then

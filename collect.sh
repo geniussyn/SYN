@@ -25,18 +25,13 @@
 #                      paper shows them once. In the lab as
 #                      code/fig_crosslingual.py; the measurements it reads ship,
 #                      because fig_strata reads the same files.
-#   sweep_ablation     the four continuous knobs -- lambda_pull, tau_p, L and the
-#                      training-query count -- swept over thirteen points and
-#                      read index-free with screen_arm.py. All four panels are
-#                      flat: the untrained arm sits at phi-hat_1 2.34 and every
-#                      trained arm between 1.33 and 1.44, so the figure shows
-#                      that the repair is what training does rather than what a
-#                      knob is set to. True, and not worth a figure's space, so
-#                      the paper does not claim it. In the lab as
-#                      code/fig_sweep_ablation.py, work/ablation_sweep.sh and
-#                      results/screen_msmarco-1m__abl-*.json, with the fourteen
-#                      adapters in the training tree, ready if a reviewer asks
-#                      how sensitive the method is to its hyperparameters.
+#   fig_sweep_ablation the four knobs as four flat panels. The sweep itself is
+#                      in the paper as an appendix TABLE, which says the same
+#                      thing in less space: the figure is four curves whose
+#                      whole message is that they are flat. In the lab as
+#                      code/fig_sweep_ablation.py. The fourteen adapters it
+#                      trained stay in the training tree -- 154 MB, and the
+#                      table is read from the screen JSON, not from them.
 #   anchor_locality    whether the gain is local to the 4,944 mined documents.
 #                      It is not -- queries whose target set contains none of
 #                      them improve 55.1% against 55.4% overall -- but the paper
@@ -174,7 +169,7 @@ MODULES="audit_timing build_mmarco encode_cache
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
          ivf_table sweep_table families_table encoders_table
          gnuplot_all export_gnuplot check_disjoint offline_cost
-         build_mscoco
+         build_mscoco hparam_sweep_table
          paths rerank_pipeline rerank_strata run_cell run_family
          run_ngfix screen_arm strata_cell style
          annot_agree build_stability config_table
@@ -192,7 +187,7 @@ cp -r "$LAB"/cpp/third_party/. "$HERE"/native/third_party/   # hnswlib, header-o
 # machine, so `cd /root/SYN` becomes `cd "${SYN_ROOT:-$(...)}"` on the way in and
 # the two housekeeping lanes that only moved files between disks do not ship.
 for w in run_all queue ngfix ngfix_pool fever_sweeps crosslingual mmarco \
-         strata ablation encoders tail4 tail5 tail6; do
+         strata ablation ablation_sweep encoders tail4 tail5 tail6; do
   [ -f "$LAB/work/$w.sh" ] || continue
   sed -e 's|^cd /root/SYN$|cd "${SYN_ROOT:?set SYN_ROOT to the lab directory}"|' \
       -e 's|/root/SYN-artifact|"$ARTIFACT"|g' \
@@ -219,6 +214,7 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
          "mutual_rank_panels*.json" "annot_summary.json" \
          "measured_speedup_*.json" "ngfix_pool_*.json" \
          "families_table.tex" "encoders_table.tex" \
+         "hparam_sweep_table.tex" \
          "frag_types.npz" \
          "perquery_*.npz" "gt_msmarco-1m__*.npz" "harddecile_msmarco-1m__*.npz"; do
   for f in "$LAB"/results/$g; do
@@ -240,12 +236,11 @@ for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
       # the paper's main FEVER measurement and belong in the repository.
       *_fever__*-mini__*|*_fever__*-e5l__*|*_fever__*-gte__*|*_fever__*-qw4__*)
         continue ;;
-      # the hyperparameter sweep is not in the paper; its readouts go with it.
-      # The other screen_*.json stay: phi-hat_1 for the shipped arms is quoted
-      # in the text and screen_arm.py is how it is computed.
-      screen_*__abl-*) continue ;;
-      # and so do its arms' ground truth and hard deciles. abl-nopull is the
-      # exception: it is one of the three rows of the ablation table.
+      # The sweep's readouts ship again: it is an appendix table now, not the
+      # figure that was dropped. hparam_sweep_table.py reads exactly these.
+      # The arms' ground truth and hard deciles still do not: the table is
+      # read index-free from the screen JSON and needs neither, and they are
+      # 15 files of npz that nothing opens.
       gt_*__abl-nopull_*|harddecile_*__abl-nopull.*) ;;
       gt_*__abl-*|harddecile_*__abl-*) continue ;;
     esac
