@@ -173,7 +173,8 @@ MODULES="audit_timing build_mmarco encode_cache
          goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
          measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
          ivf_table sweep_table families_table encoders_table
-         gnuplot_all export_gnuplot
+         gnuplot_all export_gnuplot check_disjoint offline_cost
+         build_mscoco
          paths rerank_pipeline rerank_strata run_cell run_family
          run_ngfix screen_arm strata_cell style
          annot_agree build_stability config_table
@@ -261,7 +262,8 @@ fi
 # the paper claims, and the train-split pool NGFix and SYN both draw their
 # history from. The other mMARCO languages were screened by drift only and are
 # not measured end to end, so they do not ship either.
-for c in msmarco-1m fever nq quora msmarco-fr msmarco-ar msmarco-1m-trainpool; do
+for c in msmarco-1m fever nq quora mscoco msmarco-fr msmarco-ar \
+         msmarco-1m-trainpool; do
   [ -f "$LAB/corpora/${c}_manifest.json" ] \
     && cp "$LAB/corpora/${c}_manifest.json" "$HERE/corpora/"
 done

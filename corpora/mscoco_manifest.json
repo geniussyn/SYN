@@ -1,0 +1,18 @@
+{
+  "corpus": "mscoco",
+  "repo": "yerevann/coco-karpathy",
+  "task": "caption-to-caption: a query's positives are the other captions of the same image",
+  "eval_split": "test",
+  "relevance_levels": [
+    1
+  ],
+  "graded_relevance": false,
+  "n_images": 123287,
+  "n_docs_original": 616767,
+  "n_docs_subset": 588005,
+  "n_captions_dropped_as_duplicates": 23762,
+  "n_eval_queries": 5000,
+  "positives_per_query_mean": 4.0018,
+  "positives_per_query_median": 4.0,
+  "note": "no images are used; captions only"
+}
