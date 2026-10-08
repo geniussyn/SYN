@@ -98,12 +98,12 @@ def main(fname="fig_encoders", pop="hard"):
                 if vis:
                     xmin = min(xmin, vis[0])
                 ax.plot([x for x, _ in g], [y for _, y in g],
-                        color=col, ls=ls, marker=mk, markersize=5.6,
+                        color=col, ls=ls, marker=mk, markersize=H.ms(5.6),
                         markevery=EVERY,
                         markerfacecolor=(col if fill is None else "none"),
                         markeredgecolor=("white" if fill is None else col),
                         markeredgewidth=(0.7 if fill is None else 1.2),
-                        lw=1.7, zorder=3 if a == "syn" else 2)
+                        lw=H.LW, zorder=3 if a == "syn" else 2)
         ax.set_xscale("log")
         ax.xaxis.set_major_locator(LogLocator(base=10.0, numticks=12))
         ax.xaxis.set_minor_locator(LogLocator(base=10.0, subs=(2.0, 5.0),

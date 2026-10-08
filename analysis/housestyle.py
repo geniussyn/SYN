@@ -48,6 +48,20 @@ PURPLE = "#7B2CBF"
 
 PALETTE = [BLUE, RED, GREEN, ORANGE, INK]
 
+# Marker size and line width, in one place, because they were a magic number
+# per figure and a change meant finding all of them. At column width the
+# markers do the work of separating series -- a reader picks out a square from
+# a triangle long before a solid line from a dashed one -- so they get a step
+# up, and the lines come down to stop them smearing into each other where
+# eight curves cross.
+MARK = 1.28          # multiplies each figure's own per-series marker size
+LW = 1.35            # the standard curve; legend swatches stay heavier
+
+
+def ms(base):
+    """A series' marker size, scaled by MARK."""
+    return round(base * MARK, 2)
+
 
 def setup(size=13):
     """seaborn's darkgrid frame at a given base font size."""
@@ -80,6 +94,6 @@ def setup(size=13):
         "legend.fontsize": size - 2,
         "legend.frameon": True, "legend.framealpha": 0.92,
         "legend.edgecolor": "0.8",
-        "lines.linewidth": 2.0, "lines.markersize": 5,
+        "lines.linewidth": LW, "lines.markersize": ms(5),
         "axes.prop_cycle": plt.cycler(color=PALETTE),
     })

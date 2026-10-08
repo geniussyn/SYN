@@ -46,10 +46,16 @@ ALL_COLLS = [("msmarco-1m", "MS MARCO 1M"), ("fever", "FEVER 1M"),
              ("nq", "NQ 1M"), ("quora", "Quora 523K")]
 ARMS = [("vanilla", "Vanilla", H.RED), ("syn", "SYN", H.BLUE)]
 # suffix -> (label, line style, marker, size); "" is the decile
+# The 5th percentile is measured and ships -- rerank_pipeline_P95_*.json is in
+# results/ and the numbers are quoted in the text -- but it is not drawn. Four
+# strata and two arms is eight curves per panel, and the 5th percentile runs
+# between the decile and the 1st percentile for its whole length, so it adds a
+# crossing to every panel and separates nothing. Three strata say the same
+# thing: the gap widens as the stratum narrows.
 STRATA = [("_all", "all query", "-", "o", 5.0),
           ("", "hard decile", "--", "s", 5.2),
-          ("_P95", "5th pct", ":", "^", 6.0),
           ("_P99", "1st pct", "-.", "X", 6.0)]
+STRATA_MEASURED = STRATA + [("_P95", "5th pct", ":", "^", 6.0)]
 # rows, in the order the paper reads them
 ALL_METRICS = [("mrr10_post", "MRR@10"),
                ("ndcg10_post", "nDCG@10"),
@@ -93,7 +99,7 @@ def main(fname="fig_rerank_strata", colls=MAIN_COLLS, metrics=MAIN_METRICS):
                 hi = max(hi, max(r[mkey] for r in rows))
                 ax.plot([r["ms_total"] for r in rows],
                         [r[mkey] for r in rows],
-                        color=col, ls=ls, marker=mk, markersize=ms, lw=1.8,
+                        color=col, ls=ls, marker=mk, markersize=H.ms(ms), lw=H.LW,
                         markerfacecolor=col, markeredgecolor="white",
                         markeredgewidth=0.7,
                         zorder=3 if arm == "syn" else 2)

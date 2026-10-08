@@ -129,9 +129,9 @@ def main(M=16, efc=200):
                     continue
                 drew = True
                 ax.plot([r["ms"] for r in g], [r["recall"] for r in g],
-                        color=col, ls=ls, marker=mk, markersize=ms,
+                        color=col, ls=ls, marker=mk, markersize=H.ms(ms),
                         markevery=EVERY, markerfacecolor=col,
-                        markeredgecolor="white", markeredgewidth=0.8, lw=1.9,
+                        markeredgecolor="white", markeredgewidth=0.8, lw=H.LW,
                         zorder=3 if arm == "syn" else 2)
         ax.set_xscale("log")
         ax.xaxis.set_major_locator(LogLocator(base=10.0, numticks=12))
@@ -154,7 +154,7 @@ def main(M=16, efc=200):
     fig.supylabel("Recall@10", x=0.012)
     handles = ([Line2D([], [], color=col, lw=2.6, label=nm)
                 for _, nm, col in ARMS]
-               + [Line2D([], [], color="0.35", ls=ls, marker=mk, markersize=ms,
+               + [Line2D([], [], color="0.35", ls=ls, marker=mk, markersize=H.ms(ms),
                          markerfacecolor="0.35", markeredgecolor="0.35",
                          label=nm) for _, nm, ls, mk, ms in STRATA])
     # with a spare cell the legend goes in it; with a full grid it goes above

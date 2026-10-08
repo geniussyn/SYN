@@ -160,12 +160,12 @@ def main(fname="fig_families", tag=TAG):
                     if vis:
                         xmin = min(xmin, vis[0])
                     ax.plot([x for x, _ in g], [y for _, y in g],
-                            color=col, ls=ls, marker=mk, markersize=MS[mk],
+                            color=col, ls=ls, marker=mk, markersize=H.ms(MS[mk]),
                             markevery=EVERY,
                             markerfacecolor=(col if fill is None else "none"),
                             markeredgecolor=("white" if fill is None else col),
                             markeredgewidth=(0.8 if fill is None else 1.3),
-                            lw=1.9, zorder=3 if arm == "syn" else 2)
+                            lw=H.LW, zorder=3 if arm == "syn" else 2)
             ax.set_xscale("log")
             # decades only: a panel spanning four of them cannot label the
             # 2x and 5x marks without the labels running into each other

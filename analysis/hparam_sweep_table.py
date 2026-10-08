@@ -65,7 +65,7 @@ def main(out="hparam_sweep_table.tex"):
     lines = [f"% {C}, 1,000 queries, maxM0 = 32, k = 10",
              "% phi-hat_1 is index-free; MRR and gold are exhaustive, vs fixed qrels",
              "% the shipped setting is marked; it appears once per block",
-             f"    untrained & --- & {base[0]:.3f} & {base[1]:.3f} & "
+             f"    untrained & & {base[0]:.3f} & {base[1]:.3f} & "
              f"{base[2]:.4f} & {base[3]:.4f} \\\\",
              "    \\midrule"]
     seen, xs, ys = set(), [], []

@@ -97,7 +97,7 @@ def main(fname="fig_build_cost"):
                     continue
                 drew += 1
                 ax.plot(xs, ys, color=colour, marker=mk,
-                        markersize=(6.4 if mk == "o" else 7.4), lw=1.9,
+                        markersize=(6.4 if mk == "o" else 7.4), lw=H.LW,
                         markerfacecolor=colour, markeredgecolor="white",
                         markeredgewidth=0.8,
                         zorder=3 if a == "syn" else 2)

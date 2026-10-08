@@ -106,9 +106,9 @@ def main(fname="fig_ngfix", colls=MAIN):
                         continue
                     drew += 1
                     ax.plot([x["ms"] for x in g], [x["recall"] for x in g],
-                            color=col, ls=ls, marker=mk, markersize=ms,
+                            color=col, ls=ls, marker=mk, markersize=H.ms(ms),
                             markevery=2, markerfacecolor=col,
-                            markeredgecolor="white", markeredgewidth=0.7, lw=1.8,
+                            markeredgecolor="white", markeredgewidth=0.7, lw=H.LW,
                             zorder=3 if arm == "syn" else 2)
             ax.set_xscale("log")
             ax.xaxis.set_major_locator(LogLocator(base=10.0, numticks=10))
@@ -128,7 +128,7 @@ def main(fname="fig_ngfix", colls=MAIN):
         return False
 
     handles = ([Line2D([], [], color=c, lw=2.6, label=n) for _, n, c in ARMS]
-               + [Line2D([], [], color="0.35", ls=ls, marker=mk, markersize=ms,
+               + [Line2D([], [], color="0.35", ls=ls, marker=mk, markersize=H.ms(ms),
                          markerfacecolor="0.35", markeredgecolor="0.35", label=n)
                   for _, n, ls, mk, ms in STAGES]
 )
