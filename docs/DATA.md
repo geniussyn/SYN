@@ -32,9 +32,16 @@ in the paper comes from these exact bytes; see the note at the bottom.
 ./experiments/fetch_embeddings.sh /data/emb && export SYN_EMB_DIR=/data/emb
 ```
 
-The script reads `experiments/embeddings.manifest`, fetches each file and checks it
-against the SHA-256 recorded there. A file already present and already matching
-is skipped, so an interrupted fetch resumes by re-running.
+The script reads `experiments/embeddings.manifest`, fetches each file and checks
+it against the SHA-256 recorded there. A file already present and already
+matching is skipped, so an interrupted fetch resumes by re-running.
+
+The release may be one archive or twelve files, and the script reads either --
+`experiments/embeddings.ids` says which. The archive is one link and is charged
+the host's per-file download quota once; the twelve resume one file at a time
+and a file that hits the quota does not block the other eleven. Either way
+every file is checked against the manifest after it lands, because an archive
+is a transport and not a source of truth.
 
 ### If the fetch fails
 

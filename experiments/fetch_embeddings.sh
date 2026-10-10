@@ -37,11 +37,23 @@ while read -r sum name; do
   WANT["$name"]="$sum"
 done < "$MANIFEST"
 
-# name -> file id
+# name -> file id. One reserved name: ARCHIVE, a single zip holding all twelve.
+# Uploading one file is one share setting and one link instead of twelve, and
+# the host's per-file download quota is then charged once. The cost is that a
+# failed transfer restarts from zero, where per-file ids resume by skipping
+# what already verified -- so both forms are read, and per-file wins if both
+# are present.
 declare -A ID
+ARCHIVE=""
+# counted while reading rather than asked for afterwards: under `set -u` an
+# associative array that was declared and never assigned makes ${#ID[@]} an
+# unbound-variable error, which prints to stderr and leaves the test false --
+# so the archive branch was skipped and the per-file one ran on no ids at all.
+nid=0
 while read -r name fid; do
   case "$name" in ''|'#'*) continue ;; esac
-  ID["$name"]="$fid"
+  if [ "$name" = "ARCHIVE" ]; then ARCHIVE="$fid"
+  else ID["$name"]="$fid"; nid=$((nid + 1)); fi
 done < "$IDS"
 
 ok=0; skipped=0; failed=(); stale=()
@@ -70,6 +82,52 @@ fetch() {
   return $rc
 }
 
+# ---- the single-archive form -------------------------------------------
+# Only taken when no per-file id is given, and the files it unpacks are
+# verified against the manifest exactly as fetched ones are: the archive is a
+# transport, not a source of truth.
+if [ -n "$ARCHIVE" ] && [ "$nid" -eq 0 ]; then
+  command -v unzip >/dev/null || { echo "unzip is required for the archive form"; exit 2; }
+  need=0
+  for name in $(awk '!/^#/ && NF==2 {print $2}' "$MANIFEST"); do
+    [ -f "$DEST/$name" ] || { need=1; break; }
+    [ "$(sha256sum "$DEST/$name" | cut -d' ' -f1)" = "${WANT[$name]}" ] || { need=1; break; }
+  done
+  if [ "$need" -eq 0 ]; then
+    echo "  every file already present and correct in $DEST"
+  else
+    printf '  fetch    the archive (one file, about 7.1 GiB)\n'
+    tmp="$DEST/.embeddings.zip.part"
+    if ! fetch "$ARCHIVE" "$tmp"; then
+      echo "  FAILED   transfer error"; rm -f "$tmp"; exit 1
+    fi
+    sz=$(stat -c%s "$tmp" 2>/dev/null || echo 0)
+    if [ "$sz" -lt 1000000 ] && head -c 512 "$tmp" | grep -qi '<html'; then
+      echo "  FAILED   got the confirmation or quota page, not the archive"
+      rm -f "$tmp"; exit 1
+    fi
+    unzip -o -q "$tmp" -d "$DEST" || { echo "  FAILED   the archive did not unpack"; rm -f "$tmp"; exit 1; }
+    rm -f "$tmp"
+  fi
+  bad=0
+  for name in $(awk '!/^#/ && NF==2 {print $2}' "$MANIFEST"); do
+    if [ ! -f "$DEST/$name" ]; then
+      printf '  MISSING  %s\n' "$name"; bad=$((bad+1))
+    elif [ "$(sha256sum "$DEST/$name" | cut -d' ' -f1)" != "${WANT[$name]}" ]; then
+      printf '  WRONG    %s\n' "$name"; bad=$((bad+1))
+    else
+      printf '  ok       %s\n' "$name"
+    fi
+  done
+  echo
+  [ "$bad" -eq 0 ] && { printf 'all twelve verified -> %s\n' "$DEST"
+                        [ "$DEST" != "$REPO/emb" ] && printf '\nexport SYN_EMB_DIR=%s\n' "$DEST"
+                        exit 0; }
+  printf '%d file(s) did not verify; the archive is incomplete or damaged\n' "$bad"
+  exit 1
+fi
+
+# ---- the per-file form --------------------------------------------------
 for name in $(awk '!/^#/ && NF==2 {print $2}' "$MANIFEST"); do
   want="${WANT[$name]}"
   target="$DEST/$name"

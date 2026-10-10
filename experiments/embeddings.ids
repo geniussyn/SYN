@@ -1,0 +1,15 @@
+# filename <space> Google Drive file id.
+# Written when the release was published; see embeddings.ids.template for the
+# two forms this file can take and for what the sharing has to be set to.
+msmarco-1m__vanilla_docs.npy       1TTaUh-kwlG0WTF1y_K-ekDJmQt9Skeuk
+msmarco-1m__vanilla_queries.npy    1sRf9q3xwDMqF-06CDk_x-iRKVYjz_kjh
+msmarco-1m__vanilla_manifest.json  1gT2Va4jPPyvcBX8MIZuOYRQeXvoBO7_g
+msmarco-1m__syn_docs.npy           1nVYMwQkK0xdaFuQdPtia8Bix9tzcj57G
+msmarco-1m__syn_queries.npy        1yHSw15ZP5CrloGXRQgeH9baK8c7LEdDb
+msmarco-1m__syn_manifest.json      13IhfB2GWSVzx1AT9RBYZcqJGsARSI_Zh
+fever__vanilla_docs.npy            1bFatFMfcdedNopStp5U7wbASExyAVqm9
+fever__vanilla_queries.npy         15dqhKmJ16eZeUjtCthD8_jadv1cdtffr
+fever__vanilla_manifest.json       1FnRuNhp9Cg4NO_8YzjzjQrq2ykfhR9bc
+fever__syn_docs.npy                1VZFBwAnREpVFG4vGshxXp2eOhrabHQyS
+fever__syn_queries.npy             1TCy8DulAKsMZ3fYF2vAM0X4DlFj5CbjG
+fever__syn_manifest.json           18XfC2okNtd4nCtQCVg-Uz_Y2G3C-G0lQ
