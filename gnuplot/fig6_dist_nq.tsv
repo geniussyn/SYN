@@ -1,0 +1,64 @@
+# NQ 1M, hard decile. Two panels stacked in one file.
+# phi1   is read from the stored level-0 graph, h=1, k=10
+# recall is recall@10 actually returned at efSearch=64
+# density is probability mass; the recall rows divide by the
+# 0.1 bin width so each panel encloses area 1
+# panel	arm	mean	x	density
+
+# phi1 / Vanilla  (mean 7.0696)
+phi1	Vanilla	7.069565	1	0.008696
+phi1	Vanilla	7.069565	2	0.023188
+phi1	Vanilla	7.069565	3	0.040580
+phi1	Vanilla	7.069565	4	0.060870
+phi1	Vanilla	7.069565	5	0.081159
+phi1	Vanilla	7.069565	6	0.136232
+phi1	Vanilla	7.069565	7	0.162319
+phi1	Vanilla	7.069565	8	0.188406
+phi1	Vanilla	7.069565	9	0.202899
+phi1	Vanilla	7.069565	10	0.095652
+
+
+
+# recall / Vanilla  (mean 0.6246)
+recall	Vanilla	0.624638	0	0.231884
+recall	Vanilla	0.624638	0.1	0.289855
+recall	Vanilla	0.624638	0.2	0.376812
+recall	Vanilla	0.624638	0.3	0.434783
+recall	Vanilla	0.624638	0.4	1.014493
+recall	Vanilla	0.624638	0.5	1.072464
+recall	Vanilla	0.624638	0.6	1.217391
+recall	Vanilla	0.624638	0.7	2.115942
+recall	Vanilla	0.624638	0.8	1.478261
+recall	Vanilla	0.624638	0.9	0.927536
+recall	Vanilla	0.624638	1	0.840580
+
+
+
+# phi1 / SYN  (mean 5.4145)
+phi1	SYN	5.414493	1	0.043478
+phi1	SYN	5.414493	2	0.069565
+phi1	SYN	5.414493	3	0.127536
+phi1	SYN	5.414493	4	0.124638
+phi1	SYN	5.414493	5	0.156522
+phi1	SYN	5.414493	6	0.144928
+phi1	SYN	5.414493	7	0.133333
+phi1	SYN	5.414493	8	0.072464
+phi1	SYN	5.414493	9	0.089855
+phi1	SYN	5.414493	10	0.037681
+
+
+
+# recall / SYN  (mean 0.8165)
+recall	SYN	0.816522	0	0.144928
+recall	SYN	0.816522	0.1	0.028986
+recall	SYN	0.816522	0.2	0.231884
+recall	SYN	0.816522	0.3	0.115942
+recall	SYN	0.816522	0.4	0.173913
+recall	SYN	0.816522	0.5	0.231884
+recall	SYN	0.816522	0.6	0.695652
+recall	SYN	0.816522	0.7	0.985507
+recall	SYN	0.816522	0.8	1.681159
+recall	SYN	0.816522	0.9	2.666667
+recall	SYN	0.816522	1	3.043478
+
+

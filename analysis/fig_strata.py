@@ -62,10 +62,16 @@ COLLS = [("msmarco-1m", "MS MARCO"), ("fever", "FEVER"), ("mscoco", "MS COCO"),
 ARMS = [("vanilla", "Vanilla", H.RED), ("syn", "SYN", H.BLUE)]
 # line style and marker = stratum, widest first; the percentile names are the
 # worst 10 / 5 / 1 per cent by the selector's mean ANN recall
+# The 5th percentile is measured and ships -- every strata_*.json carries it --
+# but it is not drawn, for the reason it is not drawn in the rerank figures:
+# it runs between the decile and the 1st percentile for its whole length, so
+# in six panels at two arms it adds twelve curves and separates nothing. Three
+# strata carry the claim, which is that the gap widens as the stratum narrows.
 STRATA = [("all", "Avg", "-", "o", 6.2),
           ("P90", "decile (worst 10%)", "--", "s", 6.4),
-          ("P95", "5th pct (worst 5%)", ":", "^", 7.6),
           ("P99", "1st pct (worst 1%)", "-.", "X", 7.4)]
+STRATA_MEASURED = STRATA[:2] + [("P95", "5th pct (worst 5%)", ":", "^", 7.6),
+                                STRATA[2]]
 # one marker every other point: the ef grid is dense enough that drawing all of
 # them turns eight curves into a smear
 EVERY = 2

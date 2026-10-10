@@ -200,6 +200,24 @@ for w in run_all queue ngfix ngfix_pool fever_sweeps crosslingual mmarco \
   chmod +x "$HERE/scripts/$w.sh"
 done
 
+# The embeddings are the one input too large for git. These three are the
+# repository's own -- they are not derived from the lab tree -- so they live in
+# data-release/ and are copied in after the rm -rf, which would otherwise take
+# them with the rest of scripts/ on every assembly.
+for f in fetch_embeddings.sh embeddings.manifest embeddings.ids.template; do
+  [ -f "$HERE/data-release/$f" ] || { echo "  !! data-release/$f missing"; continue; }
+  cp "$HERE/data-release/$f" "$HERE/scripts/$f"
+done
+chmod +x "$HERE/scripts/fetch_embeddings.sh" 2>/dev/null || true
+# The ids are written only when the release is actually published. If they are
+# there, they ship; if not, the fetch script says so and names the rebuild path.
+if [ -f "$HERE/data-release/embeddings.ids" ]; then
+  cp "$HERE/data-release/embeddings.ids" "$HERE/scripts/embeddings.ids"
+  echo "  embeddings.ids shipped: the fetch will resolve"
+else
+  echo "  no embeddings.ids: the fetch will refuse and point at the rebuild"
+fi
+
 # ------------------------------------------------------------------ results --
 # JSON is the evidence. The npz are the two per-query arrays a figure needs:
 # perquery_* for the recall distribution, and MS MARCO's ground truth and hard
@@ -363,10 +381,11 @@ if [ -d "$LAB/export/gnuplot" ]; then
 fi
 
 # --------------------------------------------------------------------- done --
-# docs/, tools/, README.md, LICENSE and the two shell scripts are the
-# repository's own and are versioned, not assembled; collect.sh does not touch
-# them. Everything it does write is listed in the rm -rf above, so a stale file
-# from an earlier campaign cannot survive an assembly.
+# docs/, tools/, data-release/, README.md, LICENSE and the two shell scripts
+# are the repository's own and are versioned, not assembled; collect.sh does
+# not touch them, though it does copy data-release/ into scripts/. Everything
+# it does write is listed in the rm -rf above, so a stale file from an earlier
+# campaign cannot survive an assembly.
 
 # --------------------------------------------------------------- smoke test --
 # A rename that misses a path literal produces a tree that looks right and

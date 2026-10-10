@@ -1,0 +1,37 @@
+# MS MARCO 1M, all queries: gold recall@10 after reranking
+# x is the candidate depth R, not time
+# same cross-encoder for both arms, so only the list differs
+# blocks, in index order:
+#   0  Vanilla
+#   1  SYN
+# x	y
+
+# Vanilla
+10	0.787357
+20	0.815043
+30	0.821836
+40	0.823639
+50	0.824475
+60	0.82469
+70	0.840067
+80	0.840568
+90	0.841117
+100	0.850979
+150	0.863539
+
+
+
+# SYN
+10	0.772815
+20	0.813264
+30	0.827233
+40	0.833536
+50	0.839052
+60	0.843243
+70	0.854394
+80	0.856411
+90	0.858751
+100	0.863121
+150	0.868589
+
+

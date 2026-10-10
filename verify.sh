@@ -190,6 +190,34 @@ PYEOF
   [ $? -eq 0 ] || fail=$((fail+1))
 done
 
+echo "10. the embeddings the paper measured are addressable and checkable"
+man="$LAB/scripts/embeddings.manifest"
+if [ ! -f "$man" ]; then
+  bad "no scripts/embeddings.manifest -- nothing pins the bytes the paper used"
+else
+  nsum=$(awk '!/^#/ && NF==2' "$man" | wc -l)
+  # four arms: docs + queries + manifest
+  if [ "$nsum" -eq 12 ]; then
+    ok "$nsum checksums (msmarco-1m and fever, vanilla and syn)"
+  else
+    bad "$nsum checksums, expected 12"
+  fi
+  # A published release must carry the ids; an anonymous one must not leak a
+  # host account. Both states are legal, so this only reports which one it is.
+  if [ -f "$LAB/scripts/embeddings.ids" ]; then
+    nid=$(awk '!/^#/ && NF==2' "$LAB/scripts/embeddings.ids" | wc -l)
+    [ "$nid" -eq "$nsum" ] && ok "embeddings.ids covers all $nid files" \
+      || bad "embeddings.ids has $nid of $nsum ids -- fetch will refuse the rest"
+  else
+    ok "no embeddings.ids yet; fetch refuses and points at the rebuild path"
+  fi
+  # The regeneration path is the fallback the data note promises, so the two
+  # things it needs have to be present whatever the host is doing.
+  [ -f "$LAB/analysis/encode_cache.py" ] && [ -d "$LAB/adapters/syn" ] \
+    && ok "the rebuild path is present (encode_cache.py + adapters/syn)" \
+    || bad "docs/DATA.md promises a rebuild path that does not ship"
+fi
+
 echo
 [ "$fail" -eq 0 ] && echo "all checks passed" || echo "$fail check(s) failed"
 exit $((fail > 0))

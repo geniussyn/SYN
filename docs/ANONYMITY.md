@@ -47,6 +47,26 @@ breaks anonymity, and that is not recoverable once an index has crawled it.
 After acceptance, make it public and keep the anonymised mirror alive: reviewers
 and readers cite the link they were given.
 
+## 2b. The embeddings are hosted somewhere else, and that host leaks differently
+
+The 7.68 GiB of embeddings cannot go in git, so they sit on a file host and
+`docs/DATA.md` points at it. That host is outside everything check 8 can see,
+and consumer file hosts leak in a direction authors do not expect.
+
+* **Towards the reviewer.** The owning account can appear in a file's details or
+  sharing dialog. Upload from an account created for this, not from one that
+  carries a real name, and do not reuse an account that appears anywhere else in
+  the submission.
+* **Towards the author.** This is the one that matters. A file host shows the
+  owner who opened the file. A reviewer signed in to the host while downloading
+  can end up in that log, which is a path to learning who reviewed the paper.
+  Do not open the activity log, and prefer a host that does not keep one.
+
+Neither risk is removed by the checksums or by anything in this repository. The
+regeneration path in `docs/DATA.md` exists partly for this reason: a reviewer
+who would rather not touch the host can rebuild the matrices from the corpora
+and the adapter, both of which are here.
+
 ## Licence
 
 MIT, in `LICENSE`. Two things it does not cover, and both are noted there:

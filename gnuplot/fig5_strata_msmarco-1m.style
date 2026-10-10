@@ -2,9 +2,7 @@
 # block	label	colour	dashtype	pointtype
 0	Vanilla / Avg	#EA3323	1	7
 1	Vanilla / decile (worst 10%)	#EA3323	2	5
-2	Vanilla / 5th pct (worst 5%)	#EA3323	3	9
-3	Vanilla / 1st pct (worst 1%)	#EA3323	4	3
-4	SYN / Avg	#0000F5	1	7
-5	SYN / decile (worst 10%)	#0000F5	2	5
-6	SYN / 5th pct (worst 5%)	#0000F5	3	9
-7	SYN / 1st pct (worst 1%)	#0000F5	4	3
+2	Vanilla / 1st pct (worst 1%)	#EA3323	4	3
+3	SYN / Avg	#0000F5	1	7
+4	SYN / decile (worst 10%)	#0000F5	2	5
+5	SYN / 1st pct (worst 1%)	#0000F5	4	3

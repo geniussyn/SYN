@@ -77,6 +77,26 @@ class Regions:
         c = self.assign[doc]
         return self.order[self.start[c]:self.start[c + 1]]
 
+    def sample_global(self, doc, n, forbid, rng):
+        """n documents drawn uniformly from the whole corpus, not the region.
+
+        The ablation of cluster negatives. `doc` is ignored, which is the
+        point: a region negative is near the anchor and so is a hard negative
+        the InfoNCE term has to work to separate, while a global one is almost
+        always far and separates itself.
+        """
+        N = len(self.assign)
+        out, seen = [], set(forbid)
+        while len(out) < n:
+            for d in rng.integers(0, N, size=2 * n):
+                d = int(d)
+                if d not in seen:
+                    seen.add(d)
+                    out.append(d)
+                    if len(out) == n:
+                        break
+        return np.asarray(out, dtype=np.int32)
+
     def sample(self, doc, n, forbid, rng):
         """n documents drawn uniformly from C(doc) \\ forbid."""
         pool = self.members(doc)
@@ -160,6 +180,10 @@ def main():
     ap.add_argument("--steps", type=int, default=500)
     ap.add_argument("--batch-q", type=int, default=2)
     ap.add_argument("--n-neg", type=int, default=4, help="negatives per anchor")
+    ap.add_argument("--neg-source", choices=("region", "global"), default="region",
+                    help="where InfoNCE negatives come from. region is the "
+                         "query's k-means cell, the shipped setting; global "
+                         "draws from the whole corpus and is the ablation.")
     ap.add_argument("--tau", type=float, default=0.05)
     ap.add_argument("--lambda-pull", type=float, default=1.0)
     ap.add_argument("--pull-tau", type=float, default=0.05, help="tau_b")
@@ -205,6 +229,8 @@ def main():
     torch.manual_seed(a.seed)
     rng = np.random.default_rng(a.seed)
     regions = Regions(assign, n_clusters)
+    neg_sample = (regions.sample if a.neg_source == "region"
+                  else regions.sample_global)
     log(f"SYN {a.corpus} | {nq:,} queries, K={K}, {a.steps} steps, "
         f"batch {a.batch_q}q, lambda {a.lambda_pull}, {a.precision}")
     log(f"active pairs available on {sum(bool(p) for p in pairs_of):,}/{nq:,} queries")
@@ -277,7 +303,7 @@ def main():
                 pos = int(rng.integers(K))
             s_slots = [add(v) for v in S]
             for v in S:
-                for z in regions.sample(int(v), a.n_neg, Sset, rng):
+                for z in neg_sample(int(v), a.n_neg, Sset, rng):
                     add(z)
             pairs = pairs_of[qi]
             b_slot = {}
@@ -371,7 +397,8 @@ def main():
         "lambda_pull": a.lambda_pull, "pull_tau": a.pull_tau,
         "pull_margin": a.pull_margin, "pull_grad": a.pull_grad,
         "pull_name": a.pull_name, "L": int(P["L"]), "L_lo": int(P["L_lo"]),
-        "pos_select": a.pos_select, "lr": a.lr, "schedule": a.schedule,
+        "pos_select": a.pos_select, "neg_source": a.neg_source,
+        "lr": a.lr, "schedule": a.schedule,
         "lora_r": a.lora_r, "lora_targets": targets, "precision": a.precision,
         "grad_checkpoint": not a.no_grad_checkpoint, "seed": a.seed,
         "n_train_queries": int(nq), "trainable_params": int(ntr),

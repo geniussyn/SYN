@@ -1,0 +1,37 @@
+# Quora 523K, hard queries: gold recall@10 after reranking
+# x is the candidate depth R, not time
+# same cross-encoder for both arms, so only the list differs
+# blocks, in index order:
+#   0  Vanilla
+#   1  SYN
+# x	y
+
+# Vanilla
+10	0.926618
+20	0.925937
+30	0.924627
+40	0.925461
+50	0.925544
+60	0.924544
+70	0.942211
+80	0.941211
+90	0.941211
+100	0.949944
+150	0.957694
+
+
+
+# SYN
+10	0.926972
+20	0.928886
+30	0.928427
+40	0.928177
+50	0.927541
+60	0.928405
+70	0.945822
+80	0.945745
+90	0.945078
+100	0.953078
+150	0.959912
+
+

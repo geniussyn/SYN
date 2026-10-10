@@ -1,0 +1,64 @@
+# Quora 523K, hard decile. Two panels stacked in one file.
+# phi1   is read from the stored level-0 graph, h=1, k=10
+# recall is recall@10 actually returned at efSearch=64
+# density is probability mass; the recall rows divide by the
+# 0.1 bin width so each panel encloses area 1
+# panel	arm	mean	x	density
+
+# phi1 / Vanilla  (mean 3.6410)
+phi1	Vanilla	3.641000	1	0.061000
+phi1	Vanilla	3.641000	2	0.237000
+phi1	Vanilla	3.641000	3	0.246000
+phi1	Vanilla	3.641000	4	0.187000
+phi1	Vanilla	3.641000	5	0.112000
+phi1	Vanilla	3.641000	6	0.085000
+phi1	Vanilla	3.641000	7	0.039000
+phi1	Vanilla	3.641000	8	0.022000
+phi1	Vanilla	3.641000	9	0.009000
+phi1	Vanilla	3.641000	10	0.002000
+
+
+
+# recall / Vanilla  (mean 0.8823)
+recall	Vanilla	0.882300	0	0.030000
+recall	Vanilla	0.882300	0.1	0.040000
+recall	Vanilla	0.882300	0.2	0.090000
+recall	Vanilla	0.882300	0.3	0.060000
+recall	Vanilla	0.882300	0.4	0.080000
+recall	Vanilla	0.882300	0.5	0.100000
+recall	Vanilla	0.882300	0.6	0.290000
+recall	Vanilla	0.882300	0.7	0.480000
+recall	Vanilla	0.882300	0.8	1.140000
+recall	Vanilla	0.882300	0.9	4.110000
+recall	Vanilla	0.882300	1	3.580000
+
+
+
+# phi1 / SYN  (mean 3.1950)
+phi1	SYN	3.195000	1	0.120000
+phi1	SYN	3.195000	2	0.302000
+phi1	SYN	3.195000	3	0.227000
+phi1	SYN	3.195000	4	0.156000
+phi1	SYN	3.195000	5	0.087000
+phi1	SYN	3.195000	6	0.058000
+phi1	SYN	3.195000	7	0.028000
+phi1	SYN	3.195000	8	0.014000
+phi1	SYN	3.195000	9	0.005000
+phi1	SYN	3.195000	10	0.003000
+
+
+
+# recall / SYN  (mean 0.9317)
+recall	SYN	0.931700	0	0.030000
+recall	SYN	0.931700	0.1	0.040000
+recall	SYN	0.931700	0.2	0.040000
+recall	SYN	0.931700	0.3	0.000000
+recall	SYN	0.931700	0.4	0.070000
+recall	SYN	0.931700	0.5	0.050000
+recall	SYN	0.931700	0.6	0.130000
+recall	SYN	0.931700	0.7	0.190000
+recall	SYN	0.931700	0.8	0.420000
+recall	SYN	0.931700	0.9	3.250000
+recall	SYN	0.931700	1	5.780000
+
+

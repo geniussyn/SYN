@@ -38,8 +38,20 @@ BLOCKS = [
     ("$\\tau_p$",
      [("abl-tp0.005", "$0.005$"), ("syn", "$0.02$"),
       ("abl-tp0.05", "$0.05$"), ("abl-tp0.1", "$0.1$")]),
-    ("$L$",
-     [("abl-L32", "$32$"), ("abl-L130", "$130$"), ("syn", "$1{,}100$")]),
+    # L_lo is printed beside L because the column is not a clean sweep without
+    # it. syn/pull.py sets the band floor to 0.75*L when --pull-low is absent,
+    # which is what every arm here used except the shipped one: it passes
+    # --pull-low 1000 against L = 1,100, a ratio of 0.909. L and its band move
+    # together down the column and the anchor moves differently again, so a
+    # difference cannot be attributed to L alone. The L1100b75 arm is the
+    # shipped L under the rule's band, and the pair separates the two.
+    ("$L$ \\ (band floor $L_{lo}$)",
+     [("abl-L32", "$32$ \\,/\\,$24$"),
+      ("abl-L130", "$130$ \\,/\\,$98$"),
+      ("abl-L300", "$300$ \\,/\\,$225$"),
+      ("abl-L600", "$600$ \\,/\\,$450$"),
+      ("abl-L1100b75", "$1{,}100$ \\,/\\,$825$"),
+      ("syn", "$1{,}100$ \\,/\\,$1{,}000$")]),
     ("training queries",
      [("abl-n50", "$50$"), ("abl-n100", "$100$"), ("abl-n250", "$250$"),
       ("syn", "$500$")]),

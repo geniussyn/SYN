@@ -1,0 +1,37 @@
+# NQ 1M, all queries: gold recall@10 after reranking
+# x is the candidate depth R, not time
+# same cross-encoder for both arms, so only the list differs
+# blocks, in index order:
+#   0  Vanilla
+#   1  SYN
+# x	y
+
+# Vanilla
+10	0.820418
+20	0.83104
+30	0.827684
+40	0.826043
+50	0.826236
+60	0.824691
+70	0.839417
+80	0.836616
+90	0.83314
+100	0.842845
+150	0.848638
+
+
+
+# SYN
+10	0.763229
+20	0.795577
+30	0.80533
+40	0.812959
+50	0.814649
+60	0.817087
+70	0.825101
+80	0.825777
+90	0.827419
+100	0.831547
+150	0.837461
+
+

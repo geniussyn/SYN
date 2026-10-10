@@ -287,6 +287,67 @@ def figA1_ngfix():
     return out
 
 
+# ------------------------------------------------- fig12: the distributions --
+# The only figure here that is not a curve. fig_dist draws two rows of
+# histograms -- phi_1 and the recall actually returned at a fixed budget -- and
+# the claim is the SHAPE: a mean of 7.37 is consistent with every query being
+# slightly broken and with most being whole and a few shattered, and the
+# distribution says which. The means travel with the data because each panel
+# prints its own pair.
+def fig12_distributions():
+    from fig_dist import (COLLS, ARMS, phi_dist, rec_dist,            # noqa
+                          PHI_LEVELS, REC_LEVELS, EF_SHOW)
+    wrote, cache = [], {}
+    for c, clab in COLLS:
+        rows, style, meta = [], [], []
+        for arm, lab, col in ARMS:
+            d = phi_dist(c, arm, 16, 200, "hard", 1, cache)
+            if not d:
+                continue
+            n = np.array(d["counts"], float)
+            rows.append((f"phi1 / {lab}", list(zip(PHI_LEVELS,
+                                                   n / max(n.sum(), 1)))))
+            meta.append(("phi1", lab, d["mean"]))
+            style.append((f"phi1 / {lab}", col, "-", "s"))
+        for arm, lab, col in ARMS:
+            r = rec_dist(c, arm, 16, 200, "hard")
+            if not r:
+                continue
+            n = np.array(r["counts"], float)
+            # divided by the 0.1 bin width, so the panel encloses area 1
+            rows.append((f"recall / {lab}",
+                         list(zip(REC_LEVELS, n / max(n.sum(), 1) / 0.1))))
+            meta.append(("recall", lab, r["mean"]))
+            style.append((f"recall / {lab}", col, "-", "s"))
+        if not rows:
+            continue
+        f = OUT / f"fig12_dist_{c}"
+        with f.with_suffix(".tsv").open("w") as fh:
+            fh.write(f"# {clab}, hard decile. Two panels stacked in one file.\n")
+            fh.write("# phi1   read from the stored level-0 graph, h=1, k=10\n")
+            fh.write(f"# recall recall@10 actually returned at efSearch={EF_SHOW}\n")
+            fh.write("# density is probability mass; the recall rows divide by\n")
+            fh.write("# the 0.1 bin width so each panel encloses area 1\n")
+            fh.write("# blocks, in index order:\n")
+            for i, (lab, _) in enumerate(rows):
+                fh.write(f"#   {i}  {lab}\n")
+            fh.write("# x\tdensity\n")
+            for lab, pts in rows:
+                fh.write(f"\n# {lab}\n")
+                for x, y in pts:
+                    fh.write(f"{x:.6g}\t{y:.6g}\n")
+                # two blank lines, which is what gnuplot's `index` counts as a
+                # block boundary -- one is only a break within one dataset
+                fh.write("\n\n")
+        write_style(f.with_suffix(".style"), style)
+        with (OUT / f"fig12_dist_{c}.means").open("w") as fh:
+            fh.write("# panel\tarm\tmean   -- each panel prints its own pair\n")
+            for panel, lab, m in meta:
+                fh.write(f"{panel}\t{lab}\t{m:.6g}\n")
+        wrote.append(f.name)
+    return wrote
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     total = []
@@ -295,7 +356,8 @@ def main():
                      ("fig7 build cost", fig7_build_cost),
                      ("fig8 rerank", fig8_rerank),
                      ("fig9 encoders", fig9_encoders),
-                     ("figA1 ngfix", figA1_ngfix)):
+                     ("figA1 ngfix", figA1_ngfix),
+                     ("fig12 distributions", fig12_distributions)):
         got = fn()
         print(f"{name:<18}{len(got):>3} file(s)")
         total += got

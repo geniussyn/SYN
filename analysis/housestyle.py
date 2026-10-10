@@ -70,24 +70,41 @@ def setup(size=13):
         # ACM camera-ready rejects Type 3 fonts; 42 embeds TrueType instead.
         "pdf.fonttype": 42, "ps.fonttype": 42,
         "figure.dpi": 130, "savefig.dpi": 200, "savefig.bbox": "tight",
-        # acmart sets the body in Linux Libertine, so the figures are set in
-        # it too: a panel in a different face reads as imported artwork. Falls
-        # back to DejaVu where Libertine is not installed, which keeps a figure
-        # renderable on a machine that has not got the font rather than
-        # silently substituting something arbitrary.
-        "font.family": "serif",
-        "font.serif": ["Linux Libertine O", "Libertinus Serif",
-                       "DejaVu Serif"],
+        # The venue asks for Helvetica. Helvetica itself is a licensed
+        # Monotype face and is not on this machine, so the list names it first
+        # and falls through to Nimbus Sans, which is URW's metric-compatible
+        # Helvetica and is exactly what LaTeX renders for \usepackage{helvet}.
+        # A machine that does have a licensed Helvetica -- macOS ships one --
+        # picks it up without any edit here, and the metrics do not move when
+        # it does. TeX Gyre Heros is the same clone with wider coverage;
+        # Arial and DejaVu are last so a bare machine still renders.
+        # font.family is the explicit chain, not the generic alias:
+        # matplotlib falls back per glyph only through a list of real
+        # family names. The tick labels mark a judged document with a
+        # star, which Nimbus Sans has not got -- under the alias that
+        # star came out as a last-resort box, and the only warning was
+        # on stderr. With the chain, DejaVu supplies that one glyph and
+        # every other character still comes from Helvetica or Nimbus.
+        "font.family": ["Helvetica", "Helvetica Neue", "Nimbus Sans",
+                        "TeX Gyre Heros", "Arial", "DejaVu Sans"],
+        "font.sans-serif": ["Helvetica", "Helvetica Neue", "Nimbus Sans",
+                            "TeX Gyre Heros", "Arial", "DejaVu Sans"],
+        # Maths is set in the same face as the labels rather than in a separate
+        # maths family, which is what this module did with Libertine. The
+        # generic alias is the point: naming "Nimbus Sans" here would pin the
+        # maths to the clone on a machine whose text had resolved to a real
+        # Helvetica, and the two would sit side by side in one label.
+        # cal/sf/tt are set because a custom fontset leaves them at
+        # matplotlib's defaults, and the default for cal is a cursive family
+        # nobody here has -- that printed a findfont warning on every figure
+        # with maths and silently substituted.
         "mathtext.fontset": "custom",
-        "mathtext.rm": "Linux Libertine O",
-        "mathtext.it": "Linux Libertine O:italic",
-        "mathtext.bf": "Linux Libertine O:bold",
-        # a custom fontset leaves cal/sf/tt at matplotlib's defaults, and the
-        # default for cal is a cursive family nobody here has, so every figure
-        # with maths printed a findfont warning and silently substituted
-        "mathtext.cal": "Linux Libertine O:italic",
-        "mathtext.sf": "Linux Libertine O",
-        "mathtext.tt": "Linux Libertine Mono O",
+        "mathtext.rm": "sans",
+        "mathtext.it": "sans:italic",
+        "mathtext.bf": "sans:bold",
+        "mathtext.cal": "sans:italic",
+        "mathtext.sf": "sans",
+        "mathtext.tt": "monospace",
         "font.size": size,
         "axes.titlesize": size + 2, "axes.labelsize": size,
         "xtick.labelsize": size - 1, "ytick.labelsize": size - 1,

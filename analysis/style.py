@@ -50,9 +50,31 @@ def setup():
         "axes.spines.top": False, "axes.spines.right": False,
         "legend.frameon": True, "legend.framealpha": 0.93,
         "legend.edgecolor": "0.75",
-        "font.family": "DejaVu Sans",
-        "font.sans-serif": ["DejaVu Sans"],
-        "mathtext.fontset": "dejavusans",
+        # The venue asks for Helvetica. It is a licensed Monotype face and is
+        # absent from most Linux machines, so it goes first and falls through
+        # to Nimbus Sans -- URW's metric-compatible clone, and what LaTeX
+        # renders for \usepackage{helvet}. A machine with a licensed Helvetica
+        # picks it up with no edit here. DejaVu stays last so a bare machine
+        # still renders; it used to be the only entry, which is why the two
+        # appendix figures this module draws went out in a different face from
+        # the rest of the paper.
+        # font.family is the explicit chain, not the generic alias:
+        # matplotlib falls back per glyph only through a list of real
+        # family names. The tick labels mark a judged document with a
+        # star, which Nimbus Sans has not got -- under the alias that
+        # star came out as a last-resort box, and the only warning was
+        # on stderr. With the chain, DejaVu supplies that one glyph and
+        # every other character still comes from Helvetica or Nimbus.
+        "font.family": ["Helvetica", "Helvetica Neue", "Nimbus Sans",
+                        "TeX Gyre Heros", "Arial", "DejaVu Sans"],
+        "font.sans-serif": ["Helvetica", "Helvetica Neue", "Nimbus Sans",
+                            "TeX Gyre Heros", "Arial", "DejaVu Sans"],
+        # The generic alias rather than a named clone, so the maths follows the
+        # same fallback the text does and the two cannot end up in two faces.
+        "mathtext.fontset": "custom",
+        "mathtext.rm": "sans", "mathtext.it": "sans:italic",
+        "mathtext.bf": "sans:bold", "mathtext.cal": "sans:italic",
+        "mathtext.sf": "sans", "mathtext.tt": "monospace",
     })
 
 

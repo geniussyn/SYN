@@ -89,12 +89,33 @@ def fig1():
 
 # --------------------------------------------------------------------- fig 2 --
 def fig2():
+    """Figure 2 and Figure 6: the mutual-rank matrices.
+
+    The matrix is only half the figure -- the numbers in the cells are the
+    other half, and a reader compares 788 against 4, not two shades of green.
+    So each panel ships twice: once as a matrix for `with image`, and once as
+    (col, row, text) triples for `with labels`, pre-formatted the way the
+    matplotlib panel formats them (a thousand and over becomes "1.1k").
+
+    The tick labels, the query text and which documents are judged relevant
+    come from the same record, so nothing here has to be retyped into the
+    gnuplot script by hand.
+    """
     p = RES / "mutual_rank_panels_all.json"
     if not p.exists():
         print("  !! mutual_rank_panels_all.json missing")
         return []
     d = json.loads(p.read_text())
-    wrote, meta = [], []
+    k = d["k"]
+    wrote, meta, panels = [], [], []
+
+    def cell(v):
+        if not np.isfinite(v):
+            return None
+        v = int(v)
+        return f"{v // 1000}k" if v >= 10000 else (f"{v / 1000:.1f}k"
+                                                   if v >= 1000 else f"{v:,}")
+
     for i, panel in enumerate(d["panels"], 1):
         m = np.array(panel["matrix"], dtype=float)
         f = OUT / f"fig2_panel{i}.tsv"
@@ -106,13 +127,50 @@ def fig2():
                      "nan on the diagonal is a document against itself\n")
             for row in m:
                 fh.write("\t".join("nan" if not np.isfinite(v) else f"{v:g}"
-                                   for v in row) + "\n")
+                                    for v in row) + "\n")
         wrote.append(f)
+
+        # the same numbers again, as text at the centre of each cell
+        g = OUT / f"fig2_panel{i}_labels.tsv"
+        with g.open("w") as fh:
+            fh.write("# col\trow\ttext\tdark   -- dark=1 where the cell is "
+                     "dark enough that black text would not read\n")
+            for r in range(m.shape[0]):
+                for c in range(m.shape[1]):
+                    t = cell(m[r, c])
+                    if t is None:
+                        continue
+                    fh.write(f"{c}\t{r}\t{t}\t{1 if m[r, c] > 300 else 0}\n")
+        wrote.append(g)
+
+        panels.append({
+            "i": i,
+            "title": '\\"' + panel["query"] + '\\"',
+            "kind": panel.get("kind", ""),
+            "ticks": panel["tick_labels"],
+        })
         meta.append(f"panel{i}: {panel['arm']:<8} {panel['query']}")
+
     cs = d["colour_scale"]
+    # ticks are the same in every panel of a figure, but they are written per
+    # panel because a panel that lost its star would otherwise inherit one
+    tics = ", ".join(f'"{t}" {j}' for j, t in enumerate(panels[0]["ticks"]))
+    body = []
+    for pi, pan in enumerate(panels):
+        body.append(f'\nset title "{pan["title"]}\\n{pan["kind"]}" '
+                    f'font ",7.5" offset 0,-0.5')
+        body.append(f"set xtics ({tics})")
+        body.append(f"set ytics ({tics})")
+        # one colour box for the sheet, on the last panel
+        body.append("unset colorbox" if pi < len(panels) - 1
+                    else 'set colorbox\nset cblabel "mutual rank" offset -1,0')
+        body.append(f'plot "fig2_panel{pan["i"]}.tsv" matrix with image notitle, \\\n'
+                    f'     "fig2_panel{pan["i"]}_labels.tsv" using 1:2:3:4 '
+                    f'with labels font ",5.2" tc variable notitle')
     (OUT / "fig2_mutual_rank.gp").write_text(
         FIG2_GP.format(vmin=cs["vmin"], vmax=cs["vmax"],
-                       rule=cs["L_rule_at"], n=len(d["panels"])))
+                       rule=cs["L_rule_at"], n=len(panels),
+                       k=k, body="\n".join(body)))
     (OUT / "fig2_panels.txt").write_text("\n".join(meta) + "\n")
     return wrote
 
@@ -190,34 +248,37 @@ do for [c=1:2] {
 unset multiplot
 """
 
-FIG2_GP = """# Figure 2 -- mutual rank. gnuplot >= 5.2
-# Each panel is an 11x11 matrix: the query and its exact top-10, coloured by
+FIG2_GP = """# Figures 2 and 6 -- mutual rank. gnuplot >= 5.2
+# Each panel is an {k}+1 square: the query and its exact top-10, coloured by
 # min(rank_i(j), rank_j(i)) over the whole corpus. Low is reachable.
-# The diagonal is NaN -- a document against itself -- and is left blank.
-set terminal pdfcairo size 7.6in,2.7in font "Helvetica,10" noenhanced
+# The diagonal is NaN -- a document against itself -- and is left blank. Written
+# as 0 it would plot as the tightest pair in the matrix, the opposite of true.
+#
+# The numbers in the cells are the figure's content, not decoration: a reader
+# compares 788 against 4, not two shades of green. They come from a second file
+# per panel, already formatted, and are drawn white on the dark cells and black
+# on the light ones so they read either way.
+#
+# Row and column 0 are the query, and their entries are 1..10 by construction --
+# that is the definition of the top-10, not a pattern. A star on a tick marks a
+# document the qrels judge relevant.
+set terminal pdfcairo size 7.6in,2.9in font "Helvetica,8" noenhanced
 set output "fig2_mutual_rank.pdf"
-array TITLE[{n}] = ["Vanilla, easy query", "Vanilla, fragmented", "SYN, the same query"]
 set logscale cb
 set cbrange [{vmin}:{vmax}]
 # viridis, reversed: dark is a distant pair
 set palette defined (0 "#fde725", 0.5 "#21918c", 1 "#440154")
 set cbtics 1,10,10000
+# the label colours the `tc variable` column selects: 0 black, 1 white
+set linetype 1 lc rgb "#000000"
+set linetype 2 lc rgb "#FFFFFF"
 set size ratio 1
 unset key
-# row and column 0 are the query; the ten documents follow
-set xrange [-0.5:10.5]
-set yrange [-0.5:10.5]
-set tics scale 0.4 out
-set xtics 0,2,10
-set ytics 0,2,10
-set multiplot layout 1,{n} margins 0.06,0.90,0.12,0.88 spacing 0.07
-do for [i=1:{n}] {{
-  set title TITLE[i] font "Helvetica,10"
-  # one colour bar is enough; naming it on every panel runs the label into
-  # the next panel's tics
-  if (i == {n}) {{ set cblabel "mutual rank" offset 1.2,0 }} else {{ unset cblabel }}
-  plot sprintf("fig2_panel%d.tsv", i) matrix with image
-}}
+set xrange [-0.5:{k}.5]
+set yrange [-0.5:{k}.5]
+set tics scale 0.3 out textcolor rgb "#262626" font ",6.5"
+set multiplot layout 1,{n} margins 0.05,0.90,0.13,0.83 spacing 0.07
+{body}
 unset multiplot
 """
 
