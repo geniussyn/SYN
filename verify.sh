@@ -4,8 +4,8 @@
 #   bash verify.sh              against the assembled artifact
 #   LAB=/root/SYN bash verify.sh   against the working tree instead
 #
-# The lab keeps code/, figs/final/ and its side studies under one working root;
-# the repository lays them out as analysis/, figures/ and studies/. Both are
+# The lab keeps code/ and its side studies under one working root; the
+# repository lays them out as measure/ and studies/. Both are
 # checked by the same script, so each directory is resolved once here rather
 # than spelled out at every use.
 #
@@ -19,7 +19,7 @@ if [ -d "$LAB/code" ]; then
   CODE="$LAB/code"; FIGS="$LAB/figs/final"; PHIH="$LAB/phih"
   ANNOT="$LAB/annot"; TAILC="$LAB/tailcensor"; TOOLS="$HERE"
 else
-  CODE="$LAB/analysis"; FIGS="$LAB/figures"; PHIH="$LAB/studies/hardness"
+  CODE="$LAB/measure"; FIGS="$LAB/figures"; PHIH="$LAB/studies/hardness"
   ANNOT="$LAB/studies/annotation"; TAILC="$LAB/studies/tail-censoring"
   TOOLS="$HERE/tools"
 fi
@@ -44,116 +44,83 @@ u=$(grep -rnE "default_rng\(\)|np\.random\.(rand|randn|choice|permutation|shuffl
       "$CODE" "$TRAIN/syn" 2>/dev/null | wc -l)
 [ "$u" -eq 0 ] && ok "every rng is seeded" || bad "$u unseeded call(s)"
 
-echo "3. results parse and carry their protocol"
-"$PY" - "$LAB" <<'PYEOF'
-import json, sys
-from pathlib import Path
-res = Path(sys.argv[1]) / "results"
-bad, timed = [], 0
-for p in sorted(res.glob("*.json")):
-    try:
-        d = json.loads(p.read_text())
-    except Exception as e:
-        bad.append(f"{p.name}: {e}"); continue
-    if isinstance(d, dict) and "timing_valid" in d:
-        timed += 1
-        if not d["timing_valid"]:
-            bad.append(f"{p.name}: timing_valid is false")
-n = len(list(res.glob("*.json")))
-print(f"  {'ok   ' if not bad else 'FAIL '} {n} files parse, {timed} carry timing_valid")
-for b in bad[:5]:
-    print("        " + b)
-sys.exit(1 if bad else 0)
+echo "3. the measurement code is whole"
+# The artifact ships what derives a result, not the result. So the check is
+# that the deriving code is complete: every module compiles, and the import
+# closure closes -- a module that reaches for something left behind would fail
+# only when a reviewer ran it.
+# compileall writes __pycache__ beside the sources, and a .pyc carries the
+# absolute path of the machine that wrote it -- which check 8 then reports as a
+# build-machine path. Whatever this check creates, it removes; so does check 1,
+# which imports the training package.
+if out=$("$PY" -m compileall -q "$CODE" "$TRAIN/src" 2>&1); then
+  ok "$(ls "$CODE"/*.py | wc -l) modules in $(basename "$CODE")/ compile, with src/"
+else
+  bad "a module does not compile"; echo "$out" | tail -4
+fi
+find "$LAB" "$TRAIN" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
+miss=$("$PY" - "$CODE" <<'PYEOF'
+import ast, pathlib, sys
+d = pathlib.Path(sys.argv[1])
+have = {f.stem for f in d.glob("*.py")} | {"syn"}
+missing = set()
+for f in d.glob("*.py"):
+    for n in ast.walk(ast.parse(f.read_text())):
+        if isinstance(n, ast.ImportFrom) and n.level == 0 and n.module:
+            m = n.module.split(".")[0]
+        elif isinstance(n, ast.Import):
+            for a in n.names:
+                m = a.name.split(".")[0]
+                if (d / f"{m}.py").exists() or m in have:
+                    continue
+            continue
+        else:
+            continue
+        if m in have:
+            continue
+        try:
+            __import__(m)
+        except Exception:
+            missing.add(f"{f.stem} -> {m}")
+print("\n".join(sorted(missing)))
 PYEOF
-[ $? -eq 0 ] || fail=$((fail+1))
+)
+[ -z "$miss" ] && ok "every import resolves, inside the tree or in the environment" \
+  || { bad "unresolved imports"; echo "$miss" | head -5 | sed 's/^/        /'; }
 
-echo "4. timing audit, at a tolerance tighter than the default"
-out=$(SYN_ROOT="$LAB" "$PY" "$CODE/audit_timing.py" --tol 0.03 2>&1 | tail -1)
-case "$out" in
-  "0 file(s) flagged"*) ok "$out" ;;
-  *) bad "$out" ;;
-esac
-
-echo "5. withdrawn measurements are documented, not deleted"
-if [ -f "$LAB/results/superseded/CONTENDED.md" ]; then
-  n=$(ls "$LAB"/results/superseded/*.contended.json 2>/dev/null | wc -l)
-  ok "$n withdrawn file(s) kept with CONTENDED.md"
+echo "4. nothing that draws came along"
+drew=$(ls "$CODE"/fig_*.py "$CODE"/*_table.py "$CODE"/housestyle.py \
+          "$CODE"/style.py "$CODE"/gnuplot_all.py "$CODE"/export_gnuplot.py \
+          2>/dev/null | wc -l)
+figdirs=$(ls -d "$LAB"/figures "$LAB"/gnuplot "$LAB"/results 2>/dev/null | wc -l)
+if [ "$drew" -eq 0 ] && [ "$figdirs" -eq 0 ]; then
+  ok "no figure module, no rendered figure, no measured result"
 else
-  bad "results/superseded/CONTENDED.md missing"
+  bad "$drew drawing module(s) and $figdirs output directory(ies) shipped"
 fi
 
-echo "6. every shipped figure has the script that drew it, and vice versa"
-for f in fig_families fig_mutual_rank fig_strata \
-         fig_build_cost fig_rerank_strata fig_dist; do
-  # fig_strata writes fig_strata_M16
-  [ -f "$CODE/$f.py" ] || { bad "$(basename "$CODE")/$f.py missing"; continue; }
-  hit=$(ls "$FIGS"/"$f"*.pdf 2>/dev/null | head -1)
-  [ -n "$hit" ] && ok "$f.py -> $(basename "$hit")" || bad "$f.py drew nothing"
-done
-extra=$(ls "$FIGS"/*.pdf 2>/dev/null | wc -l)
-# 8 in the main text and 2 in the appendix. The paper's fig4 is a schematic with
-# no script in the lab and is not shipped, so the submission's nine main figures
-# are eight here. The loop above checks the five whose script name matches their
-# output; encoders, hardness measures and tail censor are checked by 6b and 6d,
-# and the appendix pair is drawn by fig_ngfix.py and fig_rerank_strata.py.
-[ "$extra" -eq 11 ] && ok "9 main figures and 2 appendix, no strays" \
-  || bad "$extra figures shipped, expected 11"
+echo "5. the experiments that derive the paper's numbers are here"
+need="run_all queue ablation encoders crosslingual ngfix fever_sweeps"
+got=0; for w in $need; do [ -f "$LAB/experiments/$w.sh" ] && got=$((got+1)); done
+[ "$got" -eq 7 ] && ok "$got lanes, and $(ls "$LAB"/experiments/*.sh | wc -l) in all" \
+  || bad "$got of 7 named lanes present"
 
-echo "6b. the tail-censoring measurement ships with its scripts"
-if [ -f "$FIGS/fig_tail_censor.pdf" ]; then
-  n=$(ls "$TAILC"/*.py 2>/dev/null | wc -l)
-  c=$(ls "$TAILC"/out/*_curves.json 2>/dev/null | wc -l)
-  [ "$n" -ge 5 ] && [ "$c" -eq 2 ] \
-    && ok "fig_tail_censor.pdf with $n scripts and $c curve files" \
-    || bad "fig_tail_censor.pdf shipped with $n scripts, $c curve files"
-else
-  bad "fig_tail_censor.pdf missing"
-fi
+echo "6. the three side studies keep the evidence no code can recompute"
+# These three are not re-runnable here and are not meant to be: SpaceV's base
+# is 10 GB of int8, the phi_h comparison ran on other corpora, and the
+# annotation is a human judgement. For them the recorded output IS the thing.
+n=$(ls "$ANNOT"/*.jsonl 2>/dev/null | wc -l)
+[ "$n" -gt 0 ] && [ -f "$ANNOT/GUIDELINES.md" ] \
+  && ok "annotation: $n record file(s) with the guidelines they were made under" \
+  || bad "the 85% claim ships without its records"
+[ -f "$PHIH/VALUES.txt" ] && [ -d "$PHIH/scripts" ] \
+  && ok "phi_h: VALUES.txt with $(ls "$PHIH"/scripts | wc -l) scripts" \
+  || bad "the phi_h comparison ships without its numbers or its scripts"
+[ -f "$TAILC/RESULTS.md" ] && [ -n "$(ls "$TAILC"/out/*.json 2>/dev/null)" ] \
+  && ok "tail censoring: curves and the ground-truth audit" \
+  || bad "the tail-censoring measurement ships without its curves"
 
-echo "6c. the annotation behind the 85% claim ships with its records"
-"$PY" "$TOOLS/check_annot.py" "$ANNOT" || fail=$((fail+1))
-
-echo "6d. the phi_h comparison ships with its scripts and its numbers"
-if [ -f "$FIGS/fig_hardness_measures.pdf" ]; then
-  n=$(ls "$PHIH"/scripts/* 2>/dev/null | wc -l)
-  [ -f "$PHIH/VALUES.txt" ] && [ -f "$PHIH/table_cost.tex" ] && [ "$n" -ge 15 ] \
-    && ok "fig_hardness_measures.pdf with $n scripts, VALUES.txt and table_cost.tex" \
-    || bad "phi_h assets incomplete ($n scripts)"
-  "$PY" "$PHIH/scripts/check_coverage.py" || fail=$((fail+1))
-else
-  bad "fig_hardness_measures.pdf missing"
-fi
-
-echo "7. nothing shipped that the paper does not use"
-stray=$( { ls "$LAB"/results "$LAB"/corpora "$FIGS" "$CODE" \
-           "$HERE"/patches 2>/dev/null; } \
-         | grep -cE "msmarco-(de|ru|zh|ja|hi|id)|darth" || true)
-[ "$stray" -eq 0 ] && ok "no dropped collection leaked into results, corpora or figs" \
-  || bad "$stray file(s) the paper does not use"
-dead=$(ls "$CODE"/*.py 2>/dev/null | wc -l)
-# Raised to 43 when families_table.py and encoders_table.py were added: the
-# paper's Table 4 and Table 8 had no producing script, so their numbers could be
-# read but not recomputed. Both are entry points rather than imports, which is
-# why the count moves and the closure does not shrink.
-[ "$dead" -le 50 ] && ok "$dead modules, the import closure of what the paper runs" \
-  || bad "$dead modules shipped; the closure is 50"
-
-echo "7b. every figure can be rebuilt from the shipped data, without matplotlib"
-if command -v gnuplot > /dev/null 2>&1; then
-  if out=$(cd "$LAB/gnuplot" && make -s check 2>&1 | grep -v "missing or undefined"); then
-    ok "$(tail -1 <<<"$out")"
-  else
-    bad "gnuplot rebuild failed"; echo "$out" | tail -4
-  fi
-else
-  n=$(ls "$LAB"/gnuplot/*.gp 2>/dev/null | wc -l)
-  t=$(ls "$LAB"/gnuplot/*.tsv 2>/dev/null | wc -l)
-  [ "$n" -ge 40 ] && [ "$t" -ge 40 ] \
-    && ok "$t data file(s) and $n script(s) present (gnuplot not installed, not run)" \
-    || bad "the gnuplot bundle is incomplete: $t data, $n scripts"
-fi
-
-echo "7c. the training's product ships, and can regenerate the embeddings"
+echo "7. the training's product ships, and can regenerate the embeddings"
 na=$(ls -d "$LAB"/adapters/*/ 2>/dev/null | wc -l)
 nw=$(ls "$LAB"/adapters/*/adapter_model.safetensors 2>/dev/null | wc -l)
 if [ "$na" -ge 7 ] && [ "$nw" -eq "$na" ]; then
@@ -165,16 +132,38 @@ fi
 echo "8. no path from the machine this was built on, and nothing that names a person"
 # The second half matters more than the first. A leftover /root/SYN only breaks
 # on someone else's disk; a home directory in a path names an author, and this
-# is submitted to a double-blind venue. HOMES is the list of account names that
-# have appeared in these trees; extend it rather than relax it.
-HOMES='sieun|kyungmin|smrc'
-host=$(grep -rIl --exclude=verify.sh --exclude=collect.sh \
-         -e "/root/SYN" -e "/workspace/" -e "/root/lab" -e "/home/" \
-         -E -e "$HOMES" "$HERE" 2>/dev/null | wc -l)
-[ "$host" -eq 0 ] && ok "no build-machine path and no account name" \
-  || { bad "$host file(s) carry a build-machine path"
-       grep -rIl --exclude=verify.sh --exclude=collect.sh \
-         -e "/root/SYN" -e "/workspace/" "$HERE" 2>/dev/null | head -5 | sed 's/^/        /'; }
+# is submitted to a double-blind venue.
+#
+# The names themselves are NOT written here. They used to be, on the reasoning
+# that keeping them out of ANONYMITY.md stopped that note becoming the leak it
+# warns about -- which missed that this file ships too, so the list was
+# published instead. What ships now is the shape of the leak, not an instance
+# of it: absolute build paths, any home directory at all, and the form of a
+# hosting URL. The author adds the literal names from outside the tree:
+#
+#     SYN_NAMES='name1|name2' bash verify.sh
+#
+# A reviewer who does not set it still gets every structural check; only the
+# author can run the one that needs to know what to look for.
+#
+# .git/ is excluded on purpose: it is not distributed -- a clone builds its own
+# -- and the remote URL that lives in its config is how the author pushes. The
+# check is about the working tree, which is what a reader receives.
+PATTERNS=(-e "/root/SYN" -e "/workspace/" -e "/root/lab" -e "/home/"
+          -E -e "github\.com/[A-Za-z0-9_-]+/(SYN|syn)[A-Za-z0-9_-]*")
+if [ -n "${SYN_NAMES:-}" ]; then
+  PATTERNS+=(-E -e "$SYN_NAMES")
+  scope="paths, hosting URLs and the supplied names"
+else
+  scope="paths and hosting URLs (set SYN_NAMES to add the author list)"
+fi
+host=$(grep -rIl --exclude-dir=.git --exclude=verify.sh --exclude=collect.sh \
+         "${PATTERNS[@]}" "$HERE" 2>/dev/null | wc -l)
+[ "$host" -eq 0 ] && ok "nothing matching $scope" \
+  || { bad "$host file(s) carry a build-machine path, a hosting URL or a name"
+       grep -rIl --exclude-dir=.git --exclude=verify.sh --exclude=collect.sh \
+         "${PATTERNS[@]}" "$HERE" 2>/dev/null \
+         | sed "s|$HERE/||" | head -5 | sed 's/^/        /'; }
 
 echo "9. corpus manifests pin their seed and snapshot"
 for m in "$LAB"/corpora/*_manifest.json; do
@@ -191,9 +180,9 @@ PYEOF
 done
 
 echo "10. the embeddings the paper measured are addressable and checkable"
-man="$LAB/scripts/embeddings.manifest"
+man="$LAB/experiments/embeddings.manifest"
 if [ ! -f "$man" ]; then
-  bad "no scripts/embeddings.manifest -- nothing pins the bytes the paper used"
+  bad "no experiments/embeddings.manifest -- nothing pins the bytes the paper used"
 else
   nsum=$(awk '!/^#/ && NF==2' "$man" | wc -l)
   # four arms: docs + queries + manifest
@@ -204,8 +193,8 @@ else
   fi
   # A published release must carry the ids; an anonymous one must not leak a
   # host account. Both states are legal, so this only reports which one it is.
-  if [ -f "$LAB/scripts/embeddings.ids" ]; then
-    nid=$(awk '!/^#/ && NF==2' "$LAB/scripts/embeddings.ids" | wc -l)
+  if [ -f "$LAB/experiments/embeddings.ids" ]; then
+    nid=$(awk '!/^#/ && NF==2' "$LAB/experiments/embeddings.ids" | wc -l)
     [ "$nid" -eq "$nsum" ] && ok "embeddings.ids covers all $nid files" \
       || bad "embeddings.ids has $nid of $nsum ids -- fetch will refuse the rest"
   else
@@ -213,7 +202,7 @@ else
   fi
   # The regeneration path is the fallback the data note promises, so the two
   # things it needs have to be present whatever the host is doing.
-  [ -f "$LAB/analysis/encode_cache.py" ] && [ -d "$LAB/adapters/syn" ] \
+  [ -f "$CODE/encode_cache.py" ] && [ -d "$LAB/adapters/syn" ] \
     && ok "the rebuild path is present (encode_cache.py + adapters/syn)" \
     || bad "docs/DATA.md promises a rebuild path that does not ship"
 fi

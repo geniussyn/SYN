@@ -1,0 +1,25 @@
+# filename <space> file id on the host
+#
+# Fill one line per file and save this as experiments/embeddings.ids.
+# For a Google Drive link of the form
+#     https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view?usp=sharing
+# the id is the segment between /d/ and /view:
+#     msmarco-1m__vanilla_docs.npy  1AbCdEfGhIjKlMnOpQrStUvWxYz
+#
+# Every file must be shared as "Anyone with the link -- Viewer", otherwise the
+# fetch receives a sign-in page instead of the payload. Sharing the enclosing
+# folder is not enough: the script addresses files by id, so each file needs the
+# link permission itself. Setting it on the folder before uploading applies it
+# to everything added afterwards.
+msmarco-1m__vanilla_docs.npy
+msmarco-1m__vanilla_queries.npy
+msmarco-1m__vanilla_manifest.json
+msmarco-1m__syn_docs.npy
+msmarco-1m__syn_queries.npy
+msmarco-1m__syn_manifest.json
+fever__vanilla_docs.npy
+fever__vanilla_queries.npy
+fever__vanilla_manifest.json
+fever__syn_docs.npy
+fever__syn_queries.npy
+fever__syn_manifest.json

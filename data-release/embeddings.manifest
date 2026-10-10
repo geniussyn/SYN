@@ -1,6 +1,6 @@
 # SHA-256 of every file the embeddings release contains.
-# Checked by scripts/fetch_embeddings.sh, and usable directly:
-#     cd emb && sha256sum -c ../scripts/embeddings.manifest
+# Checked by experiments/fetch_embeddings.sh, and usable directly:
+#     cd emb && sha256sum -c ../experiments/embeddings.manifest
 c586d5410e907afaec3474a848e11ed4a0e93ebef2c19f975611fa6917f3740a  msmarco-1m__vanilla_docs.npy
 c61c4d2c1c84c294131d343a296db8f1674318592ec868b360cad18368804127  msmarco-1m__vanilla_queries.npy
 ac865a5fb33a67c0fec9b0e227a5d60f0f39a224a516ea2e992b29f183371ae1  msmarco-1m__syn_docs.npy

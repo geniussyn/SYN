@@ -59,12 +59,10 @@
 # and what paths.py resolves. A repository is read, not worked in, so the
 # artifact lays the same content out the way a reader expects to find it:
 #
-#   lab/code      -> analysis/     the measurement modules
-#   lab/results   -> results/
-#   lab/figs/final-> figures/
+#   lab/code      -> measure/      the measurement modules; nothing that draws
 #   lab/corpora   -> corpora/      manifests only
 #   lab/cpp       -> native/
-#   lab/work      -> scripts/      the lanes that produced the results
+#   lab/work      -> experiments/  the lanes that produced the results
 #   lab/tailcensor-> studies/tail-censoring/
 #   lab/phih      -> studies/hardness/
 #   lab/annot     -> studies/annotation/
@@ -88,9 +86,9 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 LAB="${LAB:-/root/SYN}"
 TRAIN="${TRAIN:-/root/SYN-train}"
 
-rm -rf "$HERE"/{analysis,results,figures,corpora,native,scripts,studies,src,tests,gnuplot,adapters}
+rm -rf "$HERE"/{analysis,measure,results,figures,corpora,native,scripts,experiments,studies,src,tests,gnuplot,adapters}
 rm -rf "$HERE"/lab "$HERE"/syn      # the layout before the rename, if a clone has it
-mkdir -p "$HERE"/{analysis,native/third_party,scripts,results,figures,corpora} \
+mkdir -p "$HERE"/{measure,native/third_party,experiments,corpora} \
          "$HERE"/studies/{tail-censoring/out,annotation,hardness/scripts} \
          "$HERE"/{src/syn,tests}
 
@@ -101,10 +99,8 @@ rewrite () {
   sed -e 's|ROOT / "figs" / "final"|ROOT / "figures"|g' \
       -e 's|ROOT / "figs"|ROOT / "figures"|g' \
       -e 's|ROOT / "code"|ROOT / "analysis"|g' \
-      -e 's|\bcode/\([a-z_0-9]*\.py\)|analysis/\1|g' \
-      -e 's|figs/final|figures|g' \
-      -e 's|^    code/      this package|    analysis/  this package|' \
-      -e 's|^    figs/      everything|    figures/   everything|' \
+      -e 's|\bcode/\([a-z_0-9]*\.py\)|measure/\1|g' \
+      -e 's|^    code/      this package|    measure/   this package|' \
       -e 's|LAB / "annot"|LAB / "studies" / "annotation"|g' \
       -e 's|ROOT / "annot"|ROOT / "studies" / "annotation"|g' \
       -e 's|LAB / "tailcensor"|LAB / "studies" / "tail-censoring"|g' \
@@ -162,22 +158,24 @@ fi
 
 # ------------------------------------------------------------- measurement ---
 # the entry points the paper needs, plus everything they import
-MODULES="audit_timing build_mmarco encode_cache
-         fig_build_cost fig_dist fig_families fig_ivf_spread fig_mutual_rank
-         fig_ngfix fig_rerank_strata fig_strata fig_sweep
-         goldk_own gt hnsw_io housestyle index_hnsw ivf_spread kappa
-         measured_speedup metrics ngfix_pool_table ngfix_prep oodness own_decile
-         ivf_table sweep_table families_table encoders_table
-         gnuplot_all export_gnuplot check_disjoint offline_cost
-         build_mscoco hparam_sweep_table
-         paths rerank_pipeline rerank_strata run_cell run_family
-         run_ngfix screen_arm strata_cell style
-         annot_agree build_stability config_table
-         fig_ablation fig_encoders
-         gold_loss"
+# The measurement code, and nothing that draws. A figure is a rendering of a
+# result, not the result; shipping the renderer invites a reader to rebuild a
+# picture instead of rerunning the measurement under it. What ships is what
+# derives a number: the harness that builds and times an index, the exact
+# top-k that every recall is measured against, the phi_h reader, and the
+# per-experiment drivers. The eleven fig_*.py, housestyle.py, style.py, the
+# six *_table.py and the two gnuplot exporters are not here.
+MODULES="paths metrics
+         gt screen_arm kappa hnsw_io index_hnsw
+         run_cell run_family strata_cell own_decile
+         encode_cache build_mmarco build_mscoco
+         rerank_pipeline rerank_strata goldk_own gold_loss
+         run_ngfix ngfix_prep ivf_spread
+         build_stability audit_timing measured_speedup oodness
+         check_disjoint offline_cost annot_agree"
 for m in $MODULES; do
   [ -f "$LAB/code/$m.py" ] || { echo "  !! code/$m.py missing"; continue; }
-  rewrite "$LAB/code/$m.py" > "$HERE/analysis/$m.py"
+  rewrite "$LAB/code/$m.py" > "$HERE/measure/$m.py"
 done
 
 cp "$LAB"/cpp/*.cpp "$LAB"/cpp/Makefile "$HERE"/native/
@@ -194,87 +192,48 @@ for w in run_all queue ngfix ngfix_pool fever_sweeps crosslingual mmarco \
       -e 's|/workspace/SYN-train|"${SYN_TRAIN:?set SYN_TRAIN to the training tree}"|g' \
       -e 's|/root/SYN-train|"${SYN_TRAIN:?set SYN_TRAIN to the training tree}"|g' \
       -e 's|/root/SYN|"$SYN_ROOT"|g' \
-      "$LAB/work/$w.sh" > "$HERE/scripts/$w.sh.tmp"
-  rewrite "$HERE/scripts/$w.sh.tmp" > "$HERE/scripts/$w.sh"
-  rm -f "$HERE/scripts/$w.sh.tmp"
-  chmod +x "$HERE/scripts/$w.sh"
+      "$LAB/work/$w.sh" > "$HERE/experiments/$w.sh.tmp"
+  rewrite "$HERE/experiments/$w.sh.tmp" > "$HERE/experiments/$w.sh"
+  rm -f "$HERE/experiments/$w.sh.tmp"
+  chmod +x "$HERE/experiments/$w.sh"
 done
 
 # The embeddings are the one input too large for git. These three are the
 # repository's own -- they are not derived from the lab tree -- so they live in
 # data-release/ and are copied in after the rm -rf, which would otherwise take
-# them with the rest of scripts/ on every assembly.
+# them with the rest of experiments/ on every assembly.
 for f in fetch_embeddings.sh embeddings.manifest embeddings.ids.template; do
   [ -f "$HERE/data-release/$f" ] || { echo "  !! data-release/$f missing"; continue; }
-  cp "$HERE/data-release/$f" "$HERE/scripts/$f"
+  cp "$HERE/data-release/$f" "$HERE/experiments/$f"
 done
-chmod +x "$HERE/scripts/fetch_embeddings.sh" 2>/dev/null || true
+chmod +x "$HERE/experiments/fetch_embeddings.sh" 2>/dev/null || true
 # The ids are written only when the release is actually published. If they are
 # there, they ship; if not, the fetch script says so and names the rebuild path.
 if [ -f "$HERE/data-release/embeddings.ids" ]; then
-  cp "$HERE/data-release/embeddings.ids" "$HERE/scripts/embeddings.ids"
+  cp "$HERE/data-release/embeddings.ids" "$HERE/experiments/embeddings.ids"
   echo "  embeddings.ids shipped: the fetch will resolve"
 else
   echo "  no embeddings.ids: the fetch will refuse and point at the rebuild"
 fi
 
 # ------------------------------------------------------------------ results --
-# JSON is the evidence. The npz are the two per-query arrays a figure needs:
-# perquery_* for the recall distribution, and MS MARCO's ground truth and hard
-# decile for the mutual-rank example.
-for g in "cell_*.json" "strata_*.json" "family_*__own_M8.json" \
-         "ngfix_*.json" \
-         "rerank_pipeline_*.json" "rerank_pipeline_P*.json" \
-         "phi1_dist_*.json" "ivf_spread_*.json" "oodness_*.json" \
-         "screen_*.json" "gold_loss_*.json" "build_stability_*.json" \
-         "config_table.json" "ablation_table.tex" "config_table.tex" \
-         "ivf_table.tex" "sweep_table.tex" \
-         "mutual_rank_panels*.json" "annot_summary.json" \
-         "measured_speedup_*.json" "ngfix_pool_*.json" \
-         "families_table.tex" "encoders_table.tex" \
-         "hparam_sweep_table.tex" \
-         "frag_types.npz" \
-         "perquery_*.npz" "gt_msmarco-1m__*.npz" "harddecile_msmarco-1m__*.npz"; do
-  for f in "$LAB"/results/$g; do
-    [ -e "$f" ] || continue
-    case "$(basename "$f")" in
-      *_hard20_*) continue ;;
-      # run_ngfix.py --timed writes a second file beside the one the figure
-      # reads. No shipped figure or table reads it -- fig_ngfix.py opens
-      # ngfix_<corpus>__<arm>.json -- and ngfix_quora__syn_timed.json carries
-      # fifteen timing inversions, one of them -91%, which is what a
-      # measurement taken while another lane was running looks like. Shipping
-      # an unread file is a small fault; shipping a contended timing as though
-      # it were evidence is not.
-      ngfix_*_timed.json) continue ;;
-      # Section 5's encoder comparison is MS MARCO only, for space. All five
-      # encoders were measured on FEVER too and the ordering is the same, but
-      # the figure does not read those runs, so they do not ship. The reference
-      # encoder has no suffix, so its FEVER arms are not caught here -- they are
-      # the paper's main FEVER measurement and belong in the repository.
-      *_fever__*-mini__*|*_fever__*-e5l__*|*_fever__*-gte__*|*_fever__*-qw4__*)
-        continue ;;
-      # The sweep's readouts ship again: it is an appendix table now, not the
-      # figure that was dropped. hparam_sweep_table.py reads exactly these.
-      # The arms' ground truth and hard deciles still do not: the table is
-      # read index-free from the screen JSON and needs neither, and they are
-      # 15 files of npz that nothing opens.
-      gt_*__abl-nopull_*|harddecile_*__abl-nopull.*) ;;
-      gt_*__abl-*|harddecile_*__abl-*) continue ;;
-    esac
-    cp -L "$f" "$HERE/results/"
-  done
-done
+# Nothing. A figure is a rendering of a result and a result is a rendering of a
+# measurement, and shipping either invites a reader to rebuild the picture
+# instead of rerunning the thing under it. What ships is what derives a number:
+# experiments/ drives measure/, and both are here. The measured JSON, the
+# rendered figures and the gnuplot data they were drawn from are all out.
+#
+# The exception is studies/, below. Those three are separate measurements whose
+# inputs are not here -- SpaceV's base is 10 GB of int8, the phi_h comparison
+# ran on other corpora, and the annotation is a human judgement that no code
+# can recompute -- so for them the recorded output IS the evidence.
 
-# the withdrawn timings, with the note that condemns them
-if [ -d "$LAB/results/superseded" ]; then
-  cp -r "$LAB/results/superseded" "$HERE/results/"
-fi
-
-# what each collection was cut from, and with which seed -- for the collections
+# ------------------------------------------------------------------ corpora --
+# What each collection was cut from, and with which seed -- for the collections
 # the paper claims, and the train-split pool NGFix and SYN both draw their
 # history from. The other mMARCO languages were screened by drift only and are
-# not measured end to end, so they do not ship either.
+# not measured end to end, so they do not ship either. The documents themselves
+# do not ship: the manifest plus syn/corpus.py rebuilds the exact id set.
 for c in msmarco-1m fever nq quora mscoco msmarco-fr msmarco-ar \
          msmarco-1m-trainpool; do
   [ -f "$LAB/corpora/${c}_manifest.json" ] \
@@ -312,25 +271,6 @@ cp "$LAB"/tailcensor/*.py "$LAB"/tailcensor/RESULTS.md "$HERE"/studies/tail-cens
 cp "$LAB"/tailcensor/out/*.json "$LAB"/tailcensor/out/*.npz \
    "$LAB"/tailcensor/out/summary.txt "$HERE"/studies/tail-censoring/out/ 2>/dev/null || true
 
-# ------------------------------------------------------------------ figures --
-# The English submission's figures, in its order. fig_dist and the main
-# fig_ngfix are drawn but appear only in the Korean draft, and fig_mutual_rank
-# ships whole rather than as the two cuts -- the paper crops it with a viewport.
-# fig_ngfix.py and fig_rerank_strata.py still ship: each draws one of the two
-# appendix figures as well as the cut the Korean draft uses.
-#   paper fig1 tail_censor   fig2 mutual_rank    fig3 hardness_measures
-#         fig5 strata        fig6 families       fig7 build_cost
-#         fig8 rerank_fever  fig9 encoders       figA1/A2 the appendix pair
-# fig4_mechanism is a schematic and has no script in the lab; it is not here.
-for f in fig_tail_censor fig_mutual_rank fig_hardness_measures \
-         fig_strata_M16 fig_families fig_build_cost \
-         fig_rerank_strata fig_encoders fig_dist \
-         figA_ngfix_all figA_rerank_all; do
-  for e in pdf png; do
-    [ -f "$LAB/figs/final/$f.$e" ] && cp "$LAB/figs/final/$f.$e" "$HERE/figures/"
-  done
-done
-
 # ----------------------------------------------------------------- adapters --
 # What the training produces, and the only thing a reader needs in order to
 # reproduce any embedding in the paper. BGE-M3 is public, the corpora are
@@ -363,48 +303,32 @@ for a in "msmarco-1m/adapter_syn:syn" \
   cp "$src"/adapter_config.json "$src"/adapter_model.safetensors "$dst"/ 2>/dev/null
 done
 
-# ------------------------------------------------------------------ gnuplot --
-# The same numbers as TSV, with a gnuplot script per figure and a Makefile.
-# The matplotlib scripts in analysis/ stay the source of record -- they draw the
-# paper's panels -- but a reader who wants the numbers should not have to run a
-# plotting stack to see them, and a reader who wants to redraw should not have
-# to parse the result JSON. `make -C gnuplot check` rebuilds all of them.
-if [ -d "$LAB/export/gnuplot" ]; then
-  mkdir -p "$HERE/gnuplot"
-  # .style travels with the data: it is the figure module's own encoding --
-  # which dimension is colour and which is the line -- and without it a
-  # redrawing has to guess, which is how four index families first came out
-  # in two colours.
-  cp "$LAB"/export/gnuplot/*.tsv "$LAB"/export/gnuplot/*.style \
-     "$LAB"/export/gnuplot/*.gp "$LAB"/export/gnuplot/*.txt \
-     "$LAB"/export/gnuplot/Makefile "$HERE/gnuplot/" 2>/dev/null || true
-fi
-
 # --------------------------------------------------------------------- done --
 # docs/, tools/, data-release/, README.md, LICENSE and the two shell scripts
 # are the repository's own and are versioned, not assembled; collect.sh does
-# not touch them, though it does copy data-release/ into scripts/. Everything
+# not touch them, though it does copy data-release/ into experiments/. Everything
 # it does write is listed in the rm -rf above, so a stale file from an earlier
 # campaign cannot survive an assembly.
 
 # --------------------------------------------------------------- smoke test --
 # A rename that misses a path literal produces a tree that looks right and
-# cannot run. Draw one figure from the assembled artifact -- fig_encoders reads
-# only result JSON, so it needs no embeddings -- and fail the assembly if the
-# layout does not resolve.
-( cd "$HERE" && SYN_ROOT="$HERE" python3 analysis/fig_encoders.py >/dev/null 2>&1 ) \
-  && echo "  smoke test: analysis/fig_encoders.py ran against the new layout" \
-  || echo "  !! smoke test FAILED: a path literal did not survive the rename"
+# cannot run. There is no figure module left to draw, so the test is two
+# cheaper ones: every module compiles, and no module still names the lab's
+# `code/` directory. Importing them is not the test -- several parse their
+# arguments at module level and would exit.
+( cd "$HERE" && python3 -m compileall -q measure src >/dev/null 2>&1 \
+  && ! grep -rqE "\bcode/[a-z_0-9]+\.py|ROOT / \"code\"" measure src experiments ) \
+  && echo "  smoke test: measure/ and src/ compile, no stale code/ path" \
+  || echo "  !! smoke test FAILED: a module did not compile or a path literal survived"
+find "$HERE" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
 find "$HERE" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
 printf '\n%s\n' "assembled $(date -u +%Y-%m-%dT%H:%MZ)"
 printf '  %-14s %s\n' \
-  "analysis"    "$(ls "$HERE"/analysis | wc -l) modules" \
-  "results"     "$(ls "$HERE"/results  | wc -l) files" \
-  "figures"     "$(ls "$HERE"/figures  | wc -l) files" \
-  "scripts"     "$(ls "$HERE"/scripts  | wc -l) lanes" \
-  "gnuplot"     "$(ls "$HERE"/gnuplot/*.tsv 2>/dev/null | wc -l) data + $(ls "$HERE"/gnuplot/*.gp 2>/dev/null | wc -l) scripts" \
-  "adapters"    "$(ls -d "$HERE"/adapters/*/ 2>/dev/null | wc -l) LoRA, $(du -sh --exclude=.git "$HERE"/adapters 2>/dev/null | cut -f1)" \
-  "src + tests" "$(ls "$HERE"/src/syn "$HERE"/tests | grep -c '\.py$') files"
-printf '  %-14s %s\n' "total" "$(du -sh --exclude=.git "$HERE" | cut -f1)"
+  "measure"     "$(ls "$HERE"/measure | wc -l) modules" \
+  "experiments" "$(ls "$HERE"/experiments | wc -l) lanes" \
+  "src + tests" "$(find "$HERE"/src "$HERE"/tests -type f | wc -l) files" \
+  "adapters"    "$(ls -d "$HERE"/adapters/*/ | wc -l) LoRA, $(du -sh "$HERE/adapters" | cut -f1)" \
+  "studies"     "$(find "$HERE"/studies -type f | wc -l) files" \
+  "total"       "$(du -sh --exclude=.git "$HERE" | cut -f1)"

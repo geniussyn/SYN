@@ -1,3 +1,0 @@
-panel1: vanilla  what type of dog mix is a morkie
-panel2: vanilla  what is the weather in allentown?
-panel3: syn      what is the weather in allentown?

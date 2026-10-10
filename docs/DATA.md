@@ -28,11 +28,11 @@ in the paper comes from these exact bytes; see the note at the bottom.
 ## Getting them
 
 ```sh
-./scripts/fetch_embeddings.sh          # into emb/
-./scripts/fetch_embeddings.sh /data/emb && export SYN_EMB_DIR=/data/emb
+./experiments/fetch_embeddings.sh          # into emb/
+./experiments/fetch_embeddings.sh /data/emb && export SYN_EMB_DIR=/data/emb
 ```
 
-The script reads `scripts/embeddings.manifest`, fetches each file and checks it
+The script reads `experiments/embeddings.manifest`, fetches each file and checks it
 against the SHA-256 recorded there. A file already present and already matching
 is skipped, so an interrupted fetch resumes by re-running.
 
@@ -52,7 +52,7 @@ this repository:
 In both cases open the folder in a browser, download by hand, and verify:
 
 ```sh
-sha256sum -c scripts/embeddings.manifest
+sha256sum -c experiments/embeddings.manifest
 ```
 
 ## Regenerating them instead
@@ -61,9 +61,9 @@ The embeddings are the one large input that is purely derived. Nothing is lost
 by rebuilding them, and it is the better path if the download is blocked:
 
 ```sh
-python3 -u analysis/encode_cache.py --corpus msmarco-1m --arm vanilla \
+python3 -u measure/encode_cache.py --corpus msmarco-1m --arm vanilla \
     --encoder bge-m3
-python3 -u analysis/encode_cache.py --corpus msmarco-1m --arm syn \
+python3 -u measure/encode_cache.py --corpus msmarco-1m --arm syn \
     --encoder bge-m3 --adapter adapters/syn
 ```
 

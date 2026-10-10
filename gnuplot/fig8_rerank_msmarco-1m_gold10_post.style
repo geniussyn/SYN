@@ -1,8 +1,0 @@
-# style of each index block, as the figure module defines it
-# block	label	colour	dashtype	pointtype
-0	Vanilla / all query	#EA3323	1	7
-1	Vanilla / hard decile	#EA3323	2	5
-2	Vanilla / 1st pct	#EA3323	4	3
-3	SYN / all query	#0000F5	1	7
-4	SYN / hard decile	#0000F5	2	5
-5	SYN / 1st pct	#0000F5	4	3

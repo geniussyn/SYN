@@ -1,4 +1,0 @@
-# the cheapest build reaching the recall the other arm needs
-# collection	M_vanilla	min_vanilla	M_syn	min_syn	saved
-MS_MARCO_1M	32	7.484	8	3.038	0.5940
-FEVER_1M	32	10.700	8	3.466	0.6760

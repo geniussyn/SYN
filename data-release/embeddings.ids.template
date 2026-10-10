@@ -1,6 +1,6 @@
 # filename <space> file id on the host
 #
-# Fill one line per file and save this as scripts/embeddings.ids.
+# Fill one line per file and save this as experiments/embeddings.ids.
 # For a Google Drive link of the form
 #     https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view?usp=sharing
 # the id is the segment between /d/ and /view:

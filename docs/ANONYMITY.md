@@ -7,20 +7,34 @@ file contents.
 ## 1. Nothing in the files names an author
 
 `verify.sh` check 8 enforces this. It fails on any absolute path from a build
-machine, on any home-directory path at all, and on the account names that have
-appeared in these trees. Those names are listed in the check itself, not here,
-so that this note does not become the leak it is warning about. A home directory
-in a path is enough to identify an author, and it survives every other form of
-anonymisation.
+machine, on any home-directory path at all, and on the shape of a hosting URL.
+A home directory in a path is enough to identify an author, and it survives
+every other form of anonymisation.
 
-Four files carried them and were fixed: `tailcensor/cfg.py`,
+It does **not** contain the author names. It used to, on the reasoning that
+keeping them out of this note stopped the note becoming the leak it warns
+about. That missed something: `verify.sh` ships. The list was published inside
+the checker that was supposed to catch it, and a reviewer reading the file saw
+two given names and the account the repository is hosted under.
+
+The names now come from outside the tree:
+
+```sh
+SYN_NAMES='name1|name2' bash verify.sh
+```
+
+Run it that way before every push. A reviewer who does not set it still gets
+every structural check; only someone who already knows the names can run the
+one that looks for them, and by then they are not learning anything.
+
+Five files carried them and were fixed: `tailcensor/cfg.py`,
 `tailcensor/check_gt.py`, `tailcensor/smoke.py`, `phih/scripts/timing_all.py`
 and `phih/scripts/run_effort.py`. All of them now take their roots from the
 environment.
 
-Extend the name list in check 8 when a new machine joins, rather than relaxing
-it. Note that this file is itself scanned, so write about the names rather than
-writing them down.
+Add a name to `SYN_NAMES` when a new machine or account joins, rather than
+relaxing the check. This file is itself scanned, and so is the checker, so
+neither of them writes a name down.
 
 ## 2. The hosting does not name an author
 

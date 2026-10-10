@@ -10,59 +10,80 @@ Three parts, kept separate because they are built and run at different times:
 |---|---|---|
 | `src/syn/`, `tests/` | training: mining, the boundary pull, the query-radial objective | source |
 | `adapters/` | what that training produced: seven LoRAs, 91 MB | weights |
-| `analysis/`, `results/`, `figures/` | measurement: index builds, timed search, every figure | source and results |
+| `measure/`, `experiments/` | measurement: index builds, timed search, the strata | source only |
 | `patches/` | the changes made to two baselines | diffs only |
 
 ## 1. What is here and what is not
 
-The evidence ships:
+What derives a number ships:
 
 ```
-results/*.json             every measurement: the parameter that was executed,
-                           the recall it returned, the milliseconds it cost
-figures/                   the paper's figures, as PDF and PNG
-analysis/, src/syn/        the scripts that produced both
-adapters/                  the seven LoRA adapters the paper measures, which
-                           regenerate any embedding in it
-scripts/                   the lanes that ran them, in the order they ran
-native/                    the timing harnesses, with hnswlib vendored beside
+src/syn/                   the training procedure: the corpus subset, the
+                           mining, the boundary-aware pull, the training loop
+measure/                   what reads a number: the index harness, the exact
+                           top-k every recall is measured against, the phi_h
+                           reader, the per-experiment drivers
+experiments/               the lanes that drive measure/, in the order they ran
+adapters/                  the seven LoRA adapters training produced, which
+                           regenerate any embedding in the paper
 corpora/*_manifest.json    the seed and BEIR snapshot each collection was cut
                            from
+native/                    the timing harnesses, with hnswlib vendored beside
 studies/                   three side measurements with their own data:
                            tail-censoring, the phi_h hardness comparison, and
                            the annotation behind the 85% claim
 ```
 
-The inputs do not, because they are large and follow from the above:
+The measurements, the figures and the data the figures were drawn from do not:
 
 ```
-corpora/      1.4 GB    rebuilt by `python -m syn.corpus`
-emb/           25 GB    rebuilt by `analysis/encode_cache.py` from the
-                        adapters that do ship, 7.4 min per million documents
-graph_*.npz   1.2 GB    dumped level-0 adjacency. Its only product is phi,
-                        which is in the cell JSON already, and it cannot be
-                        reproduced bit for bit anyway
-gt_*.npz                exact top-10, rebuilt by `analysis/gt.py`
+results/*.json             every measured cell
+figures/                   the paper's figures as PDF and PNG
+gnuplot/                   the per-panel data and scripts they were drawn from
+measure/fig_*.py           the figure modules, and the table modules with them
+```
+
+A figure is a rendering of a result and a result is a rendering of a
+measurement. Shipping either invites a reader to rebuild the picture instead of
+rerunning the thing under it, and a picture rebuilt from shipped numbers proves
+only that the numbers were copied correctly. What is here is the layer
+underneath both: run `experiments/`, and the results come back.
+
+The large inputs do not ship either, because they follow from the above:
+
+```
+corpora/      1.4 GB    rebuilt by `python -m syn.corpus`, exactly
+emb/        7.68 GiB    fetched (docs/DATA.md) or rebuilt by
+                        `measure/encode_cache.py` from the adapters that do
+                        ship, 7.4 min per million documents
+graph_*.npz   1.2 GB    dumped level-0 adjacency, and not reproducible bit for
+                        bit anyway
+gt_*.npz                exact top-10, rebuilt by `measure/gt.py`
 ```
 
 Rebuilding the corpora is exact. Each is a seeded sample (`subset_seed`
 20260809) of a pinned BEIR snapshot and the manifest carries both. Rebuilding
-the embeddings is not exact across GPUs and driver versions. Everything
-downstream of the embeddings is deterministic given them.
+the embeddings is not exact across GPUs and driver versions, which is why they
+are also hosted for download. Everything downstream of the embeddings is
+deterministic given them.
+
+### The three studies are the exception
+
+`studies/` keeps recorded output, which the rest of the repository does not.
+Those three cannot be rerun from what is here and are not meant to be: SpaceV's
+base vectors are 10 GB of int8, the phi_h comparison ran on other corpora and
+on another machine, and the annotation behind the 85% claim is a human
+judgement that no code recomputes. For them the record IS the evidence, so the
+records ship with the guidelines and the scripts that made them.
 
 ### What the paper does not use is not here
 
-We measured more than we report. A fifth collection (MS COCO, the 617k caption
-corpus) and six more mMARCO languages were measured and left out, and 63 scripts
-from earlier campaigns no longer have data to run on. None of that ships. A
-reviewer should not have to work out which files are evidence and which are
-residue, so `collect.sh` copies only what the nine figures and three tables
-actually read, and `verify.sh` fails if anything else gets in.
-
-The two lists `collect.sh` works from were computed, not remembered. The module
-list is the transitive import closure of the entry points. The result-file list
-is what a Python audit hook recorded the figures and tables opening when they
-ran.
+We measured more than we report. Six mMARCO languages beyond French and Arabic
+were measured and left out, and 63 scripts from earlier campaigns no longer have
+data to run on. None of that ships. A reviewer should not have to work out which
+files are evidence and which are residue, so `collect.sh` copies the transitive
+import closure of the entry points and nothing else, and `verify.sh` fails if
+anything that draws gets in.
 
 ## 2. What is not reproducible, and why
 
@@ -85,8 +106,9 @@ files carry one.
 **Seven measurements were withdrawn and re-taken.** Until 2026-09-22 the lock
 covered searches but not builds, so a 100-thread build in one lane could run
 through a pinned timed search in another. The signature is a larger search
-budget that came back faster, and `analysis/audit_timing.py` finds it. The seven
-files it flagged are in `results/superseded/` with the inversion that
+budget that came back faster, and `measure/audit_timing.py` finds it. The seven
+files it flagged are not here; the audit that finds them is, and it is what
+to run before believing a lane. The seven it caught had the inversion that
 condemned each and a note explaining the cause. They were re-measured, not
 repaired. The audit now reports zero over every shipped file at a 3% tolerance
 as well as the default 10%.
@@ -94,7 +116,7 @@ as well as the default 10%.
 ## 3. Determinism
 
 Every source of randomness is seeded. There is no unseeded `default_rng()` in
-`analysis/` or `syn/`, and `verify.sh` checks that.
+`measure/` or `syn/`, and `verify.sh` checks that.
 
 | what | seed | where |
 |---|---|---|
@@ -137,9 +159,9 @@ the seven withdrawn files.
 
 ```bash
 python -m syn.corpus --corpora msmarco-1m fever nq quora --n-target 1000000
-python analysis/build_mmarco.py --langs fr ar      # same documents, translated queries
-python analysis/encode_cache.py --corpus C --arm vanilla --encoder bge-m3
-python analysis/gt.py --corpus C --arm vanilla -k 10
+python measure/build_mmarco.py --langs fr ar      # same documents, translated queries
+python measure/encode_cache.py --corpus C --arm vanilla --encoder bge-m3
+python measure/gt.py --corpus C --arm vanilla -k 10
 ```
 
 About 40 minutes per collection on one RTX PRO 6000.
@@ -162,9 +184,9 @@ The adapter is trained once, on 500 English MS MARCO queries, and applied
 unchanged everywhere else, including to the French and Arabic query sets:
 
 ```bash
-python analysis/encode_cache.py --corpus C --arm syn --adapter <adapter_syn>
-python analysis/gt.py --corpus C --arm syn -k 10
-python analysis/own_decile.py --corpus C --arm ARM
+python measure/encode_cache.py --corpus C --arm syn --adapter <adapter_syn>
+python measure/gt.py --corpus C --arm syn -k 10
+python measure/own_decile.py --corpus C --arm ARM
 ```
 
 ### 4.3 Measurements
@@ -182,7 +204,7 @@ python analysis/own_decile.py --corpus C --arm ARM
 | NGFix budget sweep | `ngfix_pool.sh`, `ngfix_pool_table.py` | ~4 h |
 | DARTH and ada-ef | `darth_prep.py`, `run_darth.py` | ~3 h per arm |
 
-`scripts/*.sh` runs these in order, one lane at a time. Every stage guards on
+`experiments/*.sh` runs these in order, one lane at a time. Every stage guards on
 its own output, so re-running one that already finished is a no-op and an
 interrupted stage resumes by being run again.
 
@@ -194,29 +216,18 @@ should be removed once its predictors are fitted.
 
 ### 4.4 Figures
 
-Every figure regenerates from `results/` alone. No index, no GPU, seconds
-each. The exception is `fig_mutual_rank.py`, which ranks against the whole
-corpus and needs the document embeddings.
+The figures are not here and neither is the data they were drawn from. They
+are rendered from the measurements `experiments/` produces, by matplotlib and
+by gnuplot, and the paper is where they are. What this repository gives a
+reader is the number under the picture.
+
+`measure/audit_timing.py` is the one thing to run after a measurement lane and
+before believing it: it finds timed grids whose milliseconds cannot be a
+measurement, which is how a contended run gets caught.
 
 ```bash
-for f in analysis/fig*.py; do python "$f"; done
-python analysis/audit_timing.py        # must report zero flagged files
+python measure/audit_timing.py        # must report zero flagged files
 ```
-
-| paper figure | script |
-|---|---|
-| index families, per collection and population | `fig_families.py` |
-| mutual rank, three panels | `fig_mutual_rank.py` |
-| fragmentation and recall distributions | `fig_dist.py` |
-| difficulty strata, including cross-lingual | `fig_strata.py` |
-| cross-lingual, both populations | `fig_crosslingual.py` |
-| IVF cell spread and nprobe* | `fig_ivf_spread.py` |
-| degree and construction budget | `fig_sweep.py` |
-| composition with NGFix and DARTH | `fig_ngfix.py` |
-| end to end, three metrics by stratum | `fig_rerank_strata.py` |
-
-Tables come from `measured_speedup.py`, `darth_gain.py` and
-`ngfix_pool_table.py`.
 
 ## 5. Baselines
 
@@ -295,7 +306,7 @@ than against the working tree, because the artifact is what a reviewer has.
 Eight checks:
 
 1. the numerical core tests pass
-2. no unseeded randomness in `analysis/` or `syn/`
+2. no unseeded randomness in `measure/` or `syn/`
 3. every result file parses and carries its protocol fields
 4. the timing audit is clean at a 3% tolerance
 5. the withdrawn measurements are present with the note explaining them
@@ -307,16 +318,18 @@ Eight checks:
 
 ```
 ARTIFACT.md          this file
+DATA.md              where the embeddings are and how to check them
+ANONYMITY.md         what has to hold before this goes public
 collect.sh           assembles the artifact from the working trees
-verify.sh            the eight checks above
+verify.sh            the ten checks above
 run.sh               the training entry point
 requirements.txt
-patches/             three diffs against two baselines
-syn/  tests/         training source and its unit tests
-analysis/            37 modules: the import closure of what the paper runs
-native/             timing harnesses, Makefile, vendored hnswlib
-scripts/            the lane scripts that produced the shipped results
-results/         155 files, including superseded/
-figures/            nine figures, PDF and PNG
-corpora/         seven manifests
+patches/             diffs against the baselines, applied to their own source
+src/syn/  tests/     training source and its unit tests
+measure/             28 modules: the import closure of what derives a number
+experiments/         the lanes that drive them
+native/              timing harnesses, Makefile, vendored hnswlib
+adapters/            seven LoRA adapters, 91 MB
+corpora/             eight manifests: the snapshot and the seed, not the text
+studies/             tail-censoring, phi_h, annotation
 ```

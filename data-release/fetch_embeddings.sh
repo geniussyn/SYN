@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fetch the eight embedding matrices and their four manifests into emb/.
 #
-# Each file is verified against scripts/embeddings.manifest. A file that is
+# Each file is verified against experiments/embeddings.manifest. A file that is
 # already present and already correct is skipped, so an interrupted run is
 # resumed by running this again. Nothing is written in place: a download lands
 # in <name>.part and is renamed only after its checksum matches, so a failure
@@ -17,7 +17,7 @@ IDS="$HERE/embeddings.ids"
 [ -f "$MANIFEST" ] || { echo "missing $MANIFEST"; exit 2; }
 [ -f "$IDS" ] || {
   cat <<'MSG'
-scripts/embeddings.ids is not present, so there is nowhere to fetch from.
+experiments/embeddings.ids is not present, so there is nowhere to fetch from.
 
 That file maps each filename to its file id on the host and is written when the
 release is published. Until then, either obtain it with the paper's data link or
@@ -129,7 +129,7 @@ A quota refusal clears on its own, usually within a day; re-running this script
 resumes from what is already correct. To take the manual path, download the
 files in a browser into the destination directory and check them with
 
-    cd <destination> && sha256sum -c <repo>/scripts/embeddings.manifest
+    cd <destination> && sha256sum -c <repo>/experiments/embeddings.manifest
 
 Or skip the download entirely and regenerate -- see docs/DATA.md.
 MSG
