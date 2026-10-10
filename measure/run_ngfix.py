@@ -32,7 +32,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from index_hnsw import EXCLUSIVE, PIN_CORE, timing_lock         # noqa: E402
 from paths import ROOT                                          # noqa: E402
 
-BIN = Path("/root/baselines/ngfix/build/test")
+# NGFix's own binary, which this repository does not redistribute -- patches/
+# carries the diff and the reader builds it from the project's source. NGFIX_BIN
+# says where that build landed. The default is a sibling checkout; it used to be
+# a fixed path on the machine this was written on.
+BIN = Path(os.environ.get("NGFIX_BIN",
+                          Path(__file__).resolve().parents[2] /
+                          "baselines" / "ngfix" / "build" / "test"))
 DATA = Path("/dev/shm/ngfix")
 IDX = DATA / "idx"
 RES = ROOT / "results"

@@ -8,7 +8,16 @@ from pathlib import Path
 import numpy as np
 import torch
 
-SYN = Path("/root/syn/syn-portable"); sys.path.insert(0, str(SYN))
+# The training package, which this imports the encoder registry from. It sits
+# beside the repository as src/syn/ and in the training tree at its root; both
+# are found without an absolute path, and SYN_TRAIN overrides for a third
+# layout. It used to be a fixed path on the machine this was written on, which
+# resolved nowhere else and named that machine's directory layout.
+_here = Path(__file__).resolve().parent
+for _c in (os.environ.get("SYN_TRAIN"), _here.parent / "src", _here.parent):
+    if _c and (Path(_c) / "syn" / "__init__.py").exists():
+        sys.path.insert(0, str(_c))
+        break
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from syn.encoders import REGISTRY, load_encoder, spec_record, _pool, _tokenize  # noqa: E402
 from paths import ROOT, RESULTS  # noqa: E402

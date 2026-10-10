@@ -149,7 +149,14 @@ echo "8. no path from the machine this was built on, and nothing that names a pe
 # .git/ is excluded on purpose: it is not distributed -- a clone builds its own
 # -- and the remote URL that lives in its config is how the author pushes. The
 # check is about the working tree, which is what a reader receives.
-PATTERNS=(-e "/root/SYN" -e "/workspace/" -e "/root/lab" -e "/home/"
+# Any absolute path under a user's root, not a list of the ones remembered.
+# The list version read /root/SYN, /root/lab, /workspace/ and /home/, and two
+# shipped modules carried /root/syn (lower case) and /root/baselines, which
+# matched none of them: they named the author's directory layout and broke on
+# anyone else's disk, and this check passed anyway. A path that starts at / and
+# names somebody's home is the thing being looked for, so that is what is
+# written.
+PATTERNS=(-E -e "(/root|/home|/workspace|/Users)/[A-Za-z0-9._-]"
           -E -e "github\.com/[A-Za-z0-9_-]+/(SYN|syn)[A-Za-z0-9_-]*")
 if [ -n "${SYN_NAMES:-}" ]; then
   PATTERNS+=(-E -e "$SYN_NAMES")
